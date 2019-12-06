@@ -19,10 +19,6 @@ class Item extends SketchObject {
             scale: 1
         }
     };
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         //console.log(this.props.data);
         //console.log(this.props.data.x * this.scaleFactor)

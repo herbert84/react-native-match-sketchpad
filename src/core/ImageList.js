@@ -1,7 +1,6 @@
 export default {
     field1: require("../images/field1.png"),
     field2: require("../images/field2.png"),
-    field3: require("../images/field3.png"),
     field4: require("../images/field4.png"),
     field5: require("../images/field5.png"),
     field6: require("../images/field6.png"),

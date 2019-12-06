@@ -26,7 +26,8 @@ class Background extends Component {
         super(props);
     }
     onPressBackground() {
-        DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: null }))
+        this.props.attachObjectEvent({ selectedId: null });
+        //DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: null }))
     }
     render() {
         if (this.props.isEdit) {

@@ -18,7 +18,8 @@ class Sketchpad extends Component {
         height: PropTypes.string,
         bg: PropTypes.array,
         isEdit: PropTypes.bool,
-        items: PropTypes.array
+        items: PropTypes.array,
+        selectedId: PropTypes.string
     };
 
     static defaultProps = {
@@ -31,7 +32,8 @@ class Sketchpad extends Component {
             }
         ],
         isEdit: false,
-        items: []
+        items: [],
+        selectedId: ""
     };
     constructor(props) {
         super(props);
@@ -58,17 +60,20 @@ class Sketchpad extends Component {
         //console.log(itemName)
         let item = null;
         switch (itemName) {
-            case "SketchpadNew": item = <DrawLayer data={data} />; break;
-            case "SketchpadShape": item = <Item data={data} />; break;
-            case "SketchpadStraightLine": item = <StraightLine data={data} />; break;
-            case "SketchpadCurvedLine": item = <CurvedLine data={data} />; break;
-            case "SketchpadText": item = <SketchText data={data} />; break;
-            case "SketchpadPolygon": item = <Polygon data={data} />; break;
-            case "SketchpadRectangle": item = <Rectangle data={data} />; break;
-            case "SketchpadEllipse": item = <Ellipse data={data} />; break;
-            default: item = <Item data={data} />; break;
+            case "SketchpadNew": item = <DrawLayer data={data} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} attachAddPathEvent={(object) => this.attachAddPathEvent(object)} />; break;
+            case "SketchpadShape": item = <Item data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />; break;
+            case "SketchpadStraightLine": item = <StraightLine selectedId={this.props.itemSelectedId} data={data} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />; break;
+            case "SketchpadCurvedLine": item = <CurvedLine selectedId={this.props.itemSelectedId} data={data} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />; break;
+            case "SketchpadText": item = <SketchText data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />; break;
+            case "SketchpadPolygon": item = <Polygon data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />; break;
+            case "SketchpadRectangle": item = <Rectangle data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />; break;
+            case "SketchpadEllipse": item = <Ellipse data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />; break;
+            default: item = <Item data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />; break;
         }
         return item;
+    }
+    attachAddPathEvent(object) {
+        this.props.attachAddPathEvent(object);
     }
     render() {
         //alert(this.props.isEdit)
@@ -79,7 +84,7 @@ class Sketchpad extends Component {
         //console.log(this.props.width + ":" + this.props.height);
         return (
             <Svg height={this.props.height} width={this.props.width}>
-                <Background bg={this.props.bg} width={this.props.width} height={this.props.height} isEdit={this.props.isEdit} />
+                <Background bg={this.props.bg} width={this.props.width} height={this.props.height} isEdit={this.props.isEdit} attachObjectEvent={(object) => this.props.attachObjectEvent(object)} />
                 {this.renderItems()}
             </Svg>
         )

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Button, Dimensions, StatusBar, Image as RNImage, DeviceEventEmitter } from "react-native";
+import { View, TouchableOpacity, Platform, Dimensions, StatusBar, Image as RNImage, FlatList } from "react-native";
 import PropTypes from 'prop-types';
 import Modal from "react-native-modal";
 import Orientation from "react-native-orientation";
@@ -7,6 +7,8 @@ import Sketchpad from "./Sketchpad";
 import Utils from "./Utils";
 import ToolBar from "../tool/ToolBar";
 import Global from "./Global";
+//import ToolElementItems from "../data/ToolElement";
+import DataModal from "./DataModel";
 
 const ScreenWidth = Dimensions.get("window").width;
 const ScreenHeight = Dimensions.get("window").height;
@@ -37,76 +39,79 @@ class Container extends Component {
             isEdit: false,
             screenHeight: Dimensions.get("window").height,
             screenWidth: Dimensions.get("window").width,
-            statusBarHidden: false,
+            statusBarHidden: true,
             statusBarStyle: "dark-content",
             action: "read", //当前画板出于的行为，诸如read, drawing, edit等等,
-            showToolBar: false
+            itemSelected: false,
+            selectedObjectShape: null,
+            isPortrait: true,
+            itemSelectedId: null
         }
         this.needRotate = true
     }
     componentDidMount() {
-        let that = this;
-
         // 设置屏幕模式
         this.setScreenOrientation();
-
-        this.objectListener = DeviceEventEmitter.addListener("sketchobject_" + that.instanceId, (object) => {
-            // 收到监听后想做的事情 // 监听
-            let objectSelected = JSON.parse(object);
-            //console.log(objectSelected);
-            this.setState({
-                showToolBar: objectSelected.selectedId ? true : false,
-                selectedObjectType: objectSelected.selectedId ? objectSelected.type : null
-            });
-        });
-
-        //监听物体对象被点击的事件，如果当前物体id等于被点击的对象id，则当前被选中且添加矩形背景，如果不是则不被选中且无矩形背景
-        this.addPathListener = DeviceEventEmitter.addListener("sketchAddPath_" + that.instanceId, (object) => {
-            // 收到监听后想做的事情 // 监听
-            let objectSelected = JSON.parse(object);
-            //console.log(objectSelected);
-            let items = that.state.items;
-            let newItems = [];
-            for (var i in items) {
-                if (items[i].status === "drawing") {
-                    if (objectSelected.type === "SketchpadPolygon") {
-                        items[i].points.push(objectSelected.x)
-                        items[i].points.push(objectSelected.y)
-                    } else if (objectSelected.type === "SketchpadRectangle") {
-                        items[i].x = objectSelected.x;
-                        items[i].y = objectSelected.y;
-                        items[i].width = objectSelected.width;
-                        items[i].height = objectSelected.height;
-                        if (objectSelected.status === "done")
-                            items[i].status = "done";
-                    } else if (objectSelected.type === "SketchpadShape") {
-                        items[i].x = objectSelected.x;
-                        items[i].y = objectSelected.y;
-                        if (objectSelected.status === "done")
-                            items[i].status = "done";
-                    }
-                }
-                if (objectSelected.status === "done") {
-                    if (items[i].status !== "new")
-                        newItems.push(items[i])
-                } else {
-                    newItems.push(items[i])
-                }
-            }
-            that.setState({
-                items: newItems
-            })
-            if (objectSelected.status === "done") {
-                that.startDrawMode(objectSelected.type);
-            }
+        // 设置tool显示
+        this.setState({
+            isEdit: (this.props.isEditable && this.props.fullMode) ? true : false
         });
     }
-    componentWillUnmount() {
-        if (this.addPathListener) {
-            this.addPathListener.remove();
+    needToListenerObjectEvent(object) {
+        //let objectSelected = JSON.parse(object);
+        //console.log(objectSelected);
+        this.setState({
+            itemSelectedId: object.selectedId,
+            itemSelected: object.selectedId ? true : false,
+            selectedObjectShape: object.selectedId ? object.shape : null
+        });
+    }
+    needToListenerAddPathEvent(object) {
+        // 收到监听后想做的事情 // 监听
+        //let objectSelected = JSON.parse(object);
+        //console.log(objectSelected);
+        let items = this.state.items;
+        let newItems = [];
+        for (var i in items) {
+            if (items[i].status === "drawing") {
+                if (object.shape === "SketchpadPolygon" || object.shape === "SketchpadCurvedLine") {
+                    items[i].points.push(object.x)
+                    items[i].points.push(object.y)
+                } else if (object.shape === "SketchpadRectangle" || object.shape === "SketchpadEllipse") {
+                    items[i].x = object.x;
+                    items[i].y = object.y;
+                    items[i].width = object.width;
+                    items[i].height = object.height;
+                    if (object.status === "done")
+                        items[i].status = "done";
+                } else if (object.shape === "SketchpadStraightLine") {
+                    items[i].points = [
+                        object.startX,
+                        object.startY,
+                        object.endX,
+                        object.endY
+                    ];
+                    if (object.status === "done")
+                        items[i].status = "done";
+                } else if (object.shape === "SketchpadShape") {
+                    items[i].x = object.x;
+                    items[i].y = object.y;
+                    if (object.status === "done")
+                        items[i].status = "done";
+                }
+            }
+            if (object.status === "done") {
+                if (items[i].status !== "new")
+                    newItems.push(items[i])
+            } else {
+                newItems.push(items[i])
+            }
         }
-        if (this.objectListener) {
-            this.objectListener.remove();
+        this.setState({
+            items: newItems
+        })
+        if (object.status === "done") {
+            this.startDrawMode({ shape: object.shape, type: object.type ? object.type : null });
         }
     }
     switchSizeMode() {
@@ -127,9 +132,10 @@ class Container extends Component {
             console.log(ScreenWidth + ":" + ScreenHeight)
             if (this.needRotate) {
                 this.setState({
-                    statusBarHidden: true
-                })
-                Orientation.lockToLandscapeRight();
+                    statusBarHidden: true,
+                    isPortrait: false
+                });
+                (Platform.OS === "android") ? Orientation.lockToLandscapeLeft() : Orientation.lockToLandscapeRight()
             } else {
                 this.setState({
                     statusBarStyle: "light-content"
@@ -138,7 +144,8 @@ class Container extends Component {
         } else {
             this.setState({
                 statusBarHidden: false,
-                statusBarStyle: "dark-content"
+                statusBarStyle: "dark-content",
+                isPortrait: true
             })
             this.finalizeDrawing();
             //console.log(ScreenWidth + ":" + ScreenHeight)
@@ -157,93 +164,39 @@ class Container extends Component {
         //alert(this.props.isEdit)
         if (this.needRotate) {
             return (
-                <View style={{ width: "100%", height: "100%", flexDirection: "row" }}>
+                <View style={{ flex: 1, flexDirection: "row" }}>
+                    <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
                     <View style={{ height: ScreenWidth, width: Utils.isIPhoneXPaddTop(true) }} />
-                    <Sketchpad width={fullScreenBgWidth} height={sketchpadHeight} bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} />
+                    <Sketchpad width={fullScreenBgWidth} height={sketchpadHeight} itemSelectedId={this.state.itemSelectedId} bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} attachObjectEvent={(object) => this.needToListenerObjectEvent(object)} attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)} />
                     {this.renderTool()}
                 </View>
             )
         } else {
             return (
-                <View style={{ width: "100%", height: "100%", flexDirection: "column", paddingTop: Utils.isIPhoneXPaddTop() }}>
-                    <Sketchpad width={fullScreenBgWidth} height={sketchpadHeight} bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} />
+                <View style={{ flex: 1, flexDirection: "column", paddingTop: Utils.isIPhoneXPaddTop() }}>
+                    <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
+                    <Sketchpad width={fullScreenBgWidth} height={sketchpadHeight} itemSelectedId={this.state.itemSelectedId} bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} attachObjectEvent={(object) => this.needToListenerObjectEvent(object)} attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)} />
                     {this.renderTool()}
                 </View>
             )
         }
     }
-    startDrawMode(shape) {
+    startDrawMode(item) {
         // 点击创建物件时，取消选择当前画布所有物体
-        DeviceEventEmitter.emit("sketchobject_" + this.instanceId, JSON.stringify({ selectedId: null }))
+        //DeviceEventEmitter.emit("sketchobject_" + this.instanceId, JSON.stringify({ selectedId: null }))
         let newItems = this.state.items;
         let scale = this.props.width === "100%" ? 400 / 1960 : this.props.width / 1960;
         let width = (this.needRotate) ? (1960 / 1251 * ScreenWidth / scale).toString() : ScreenWidth / scale.toString();
         let height = (this.needRotate) ? ScreenWidth / scale.toString() : (1960 / 1251 * ScreenWidth / scale).toString();
-        let newObject = {};
-        if (shape === "SketchpadShape") {
-            newObject = {
-                className: "sap.sports.ui.controls.sketchpad.SketchpadShape",
-                status: "drawing",
-                id: "__shape0-" + Utils.randomStringId(9),
-                showSelection: true,
-                rotation: 0,
-                scale: 1,
-                mirror: false,
-                visible: true,
-                x: 0,
-                y: 0,
-                z: 0,
-                image: "/sap/sports/trm/ui/catalog/images/red5.png"
-            }
-            newItems.push(newObject)
-        } else if (shape === "SketchpadPolygon") {
-            newObject = {
-                className: "sap.sports.ui.controls.sketchpad.SketchpadPolygon",
-                status: "drawing",
-                id: "__polygon0-" + Utils.randomStringId(9),
-                width: 1,
-                style: [],
-                visible: true,
-                z: 0,
-                color: "rgb(0, 0, 0)",
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
-                points: []
-            }
-            newItems.push(newObject)
-        } else if (shape === "SketchpadRectangle") {
-            newObject = {
-                className: "sap.sports.ui.controls.sketchpad.SketchpadRectangle",
-                status: "drawing",
-                id: "__rectangle0-" + Utils.randomStringId(9),
-                lineWidth: 1,
-                width: 0,
-                height: 0,
-                style: [],
-                visible: true,
-                x: 0,
-                y: 0,
-                z: 0,
-                color: "rgb(0, 0, 0)",
-                backgroundColor: "rgba(0, 0, 0, 0.6)"
-            }
-            newItems.push(newObject)
-        }
-        newItems.push({
-            className: "sap.sports.ui.controls.sketchpad.SketchpadNew",
-            status: "new",
-            type: shape,
-            data: newObject,
-            id: "__new-vb6ge30j",
-            width: 1,
-            style: [],
-            visible: true,
-            z: 0,
-            color: "rgb(0, 0, 0)",
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
-            points: [0, 0, width, 0, width, height, 0, height]
-        })
+        let newItem = DataModal.addObject(item);
+        let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
+        newItems.push(newItem);
+        newItems.push(drawLayerItem);
+
         this.setState({
+            itemSelected: null,
             items: newItems,
+            selectedObjectShape: null,
             action: "drawing"
         })
     }
@@ -263,34 +216,20 @@ class Container extends Component {
             action: "read"
         });
     }
-    renderEditTool() {
-        if (this.state.isEdit && this.state.action === "read") {
-            return (<View style={{ flexDirection: "row" }}>
-                <Button onPress={() => this.startDrawMode("SketchpadShape")} title="球员" />
-                <Button onPress={() => this.startDrawMode("SketchpadPolygon")} title="多边形" />
-                <Button onPress={() => this.startDrawMode("SketchpadRectangle")} title="矩形" />
-                <Button onPress={() => this.switchSizeMode()} title="缩小" /></View>)
-        }
-        else if (this.state.action === "drawing") {
-            return (<View style={{ flexDirection: "row" }}>
-                <Button onPress={() => this.finalizeDrawing()} title="确定" />
-                <Button onPress={() => this.switchSizeMode()} title="缩小" /></View>)
-        } else {
-            return (<Button onPress={() => this.switchSizeMode()} title="缩小" />)
-        }
-    }
     renderTool() {
-        if (this.state.showToolBar) {
-            return (
-                <ToolBar selectedObjectType={this.state.selectedObjectType} />
-            )
-        } else {
-            return (
-                <View style={{ flexDirection: "row" }}>
-                    {this.renderEditTool()}
-                </View>
-            )
-        }
+        return (
+            <View style={{ flexDirection: "row" }}>
+                <ToolBar
+                    isPortrait={this.state.isPortrait}
+                    isEdit={this.state.isEdit}
+                    action={this.state.action}
+                    itemSelected={this.state.itemSelected}
+                    selectedObjectShape={this.state.selectedObjectShape}
+                    startDrawMode={(item) => this.startDrawMode(item)}
+                    onPressSwitchSize={() => this.switchSizeMode()}
+                    onPressConfirmDrawing={() => this.finalizeDrawing()} />
+            </View>
+        )
     }
     render() {
         const bgImage = RNImage.resolveAssetSource(Utils.loadImage(this.dataModel.background[0].image));
@@ -303,7 +242,6 @@ class Container extends Component {
         let canvasWidth = this.props.width || 400;
         let canvasHeight = (this.needRotate) ? canvasWidth * (1251 / 1960) : canvasWidth * (1960 / 1251);
         return (<View style={{ width: canvasWidth, height: canvasHeight }}>
-            <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
             <TouchableOpacity onPress={() => this.switchSizeMode()}>
                 <Sketchpad width="100%" height="100%" bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} />
             </TouchableOpacity>

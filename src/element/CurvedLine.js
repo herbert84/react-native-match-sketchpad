@@ -25,10 +25,10 @@ class CurvedLine extends Line {
         for (var i = 0; i < points.length - 1; i += 2) {
             pointsArray.push({ x: points[i] * this.scaleFactor, y: points[i + 1] * this.scaleFactor })
         }
-        this.maxXPoint = _.maxBy(pointsArray, 'x');
-        this.maxYPoint = _.maxBy(pointsArray, 'y');
-        this.minXPoint = _.minBy(pointsArray, 'x');
-        this.minYPoint = _.minBy(pointsArray, 'y');
+        this.maxXPoint = _.maxBy(pointsArray, 'x') || { x: 0, y: 0 };
+        this.maxYPoint = _.maxBy(pointsArray, 'y') || { x: 0, y: 0 };
+        this.minXPoint = _.minBy(pointsArray, 'x') || { x: 0, y: 0 };
+        this.minYPoint = _.minBy(pointsArray, 'y') || { x: 0, y: 0 };
 
         this.state = {
             x: this.minXPoint.x ? this.minXPoint.x : 0,

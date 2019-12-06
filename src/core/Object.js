@@ -20,15 +20,12 @@ class SketchObject extends Component {
     constructor(props) {
         super(props);
         this._panResponder = {};
-        this.state = {
-            isSelected: false
-        }
-        this.initShape()
+        this.initShape(false)
     }
     componentDidMount() {
         //监听物体对象被点击的事件，如果当前物体id等于被点击的对象id，则当前被选中且添加矩形背景，如果不是则不被选中且无矩形背景
         console.log("this.isEdit:" + this.isEdit)
-        if (this.isEdit) {
+        /*if (this.isEdit) {
             this.objectListener = DeviceEventEmitter.addListener("sketchobject_" + Global.instanceId, (object) => {
                 // 收到监听后想做的事情 // 监听
                 let objectSelected = JSON.parse(object);
@@ -37,12 +34,26 @@ class SketchObject extends Component {
                     isSelected: objectSelected.selectedId === this.props.data.id
                 });
             });
+        }*/
+    }
+    /*objectSelectedListener(object) {
+        if (this.isEdit) {
+            let objectSelected = JSON.parse(object);
+            //console.log(objectSelected);
+            this.setState({
+                isSelected: objectSelected.selectedId === this.props.data.id
+            });
+        }
+    }*/
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.selectedId === this.props.data.id) {
+            console.log("found and selected")
+            this.initShape(true)
+        } else {
+            this.initShape(false)
         }
     }
-    componentWillReceiveProps(nextProps) {
-        this.initShape()
-    }
-    initShape() {
+    initShape(isSelected) {
         let shape = Utils.getItemType(this.props.data);
         switch (shape) {
             case "SketchpadPolygon":
@@ -59,7 +70,8 @@ class SketchObject extends Component {
 
                     this.state = {
                         x: this.minXPoint.x ? this.minXPoint.x : 0,
-                        y: this.minYPoint.y ? this.minYPoint.y : 0
+                        y: this.minYPoint.y ? this.minYPoint.y : 0,
+                        isSelected
                     }
                 }
                 break;
@@ -68,7 +80,8 @@ class SketchObject extends Component {
             case "SketchpadRectangle":
                 this.state = {
                     x: this.props.data.x * this.scaleFactor,
-                    y: this.props.data.y * this.scaleFactor
+                    y: this.props.data.y * this.scaleFactor,
+                    isSelected
                 }
                 break;
             default: break;
@@ -144,7 +157,8 @@ class SketchObject extends Component {
             this.props.data.x = this.state.x / this.scaleFactor;
             this.props.data.y = this.state.y / this.scaleFactor;
         }
-        DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: this.props.data.id, type: shape, item: this.props.data }))
+        this.props.attachObjectEvent({ selectedId: this.props.data.id, shape, item: this.props.data });
+        //DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: this.props.data.id, shape, item: this.props.data }))
     }
     getRectSize() {
         let { points } = this.props.data;
@@ -191,7 +205,8 @@ class SketchObject extends Component {
      */
     objectOnPress() {
         let shape = Utils.getItemType(this.props.data);
-        DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: this.props.data.id, type: shape }))
+        this.props.attachObjectEvent({ selectedId: this.props.data.id, shape });
+        //DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: this.props.data.id, shape }))
     }
     objectContainer(item, rect) {
         if (this.isEdit) {

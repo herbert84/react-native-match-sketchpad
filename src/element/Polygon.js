@@ -6,10 +6,6 @@ import { Svg, G, Path, Rect } from 'react-native-svg';
 import * as _ from "lodash";
 
 class Polygon extends SketchObject {
-    constructor(props) {
-        super(props);
-    }
-
     /**
      * 按照points数组里面的点的顺序绘制多边形
      *
