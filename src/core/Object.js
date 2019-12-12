@@ -189,6 +189,15 @@ class SketchObject extends Component {
         this.props.attachObjectEvent({ selectedId: this.props.data.id, shape });
         //DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: this.props.data.id, shape }))
     }
+    /**
+     * @description 双击物件后的响应函数
+     *
+     * @memberof SketchObject
+     */
+    objectOnDoublePress() {
+        let shape = Utils.getItemType(this.props.data);
+        this.props.attachObjectEvent({ selectedId: this.props.data.id, shape, eventType: "DOUBLE_CLICK" });
+    }
     objectContainer(item, rect) {
         if (this.isEdit) {
             if (this.props.data.status === "drawing") {

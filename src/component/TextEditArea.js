@@ -24,7 +24,7 @@ class TextEditArea extends Component {
         this.rootViewPaddingBottom = new Animated.Value(this.isIphonexPortrait ? 34 : 0);
         this.state = {
             textInputHeight: 20,
-            value: props.value
+            value: props.data.text
         };
     }
 
@@ -62,12 +62,15 @@ class TextEditArea extends Component {
 
     render() {
         return (
-            <Animatable.View style={[styles.rootView, {
-                width: this.screenWidth,
-                height: this.screenHeight,
-                paddingTop: this.isIphonexPortrait ? 34 : 0,
-                paddingBottom: this.rootViewPaddingBottom
-            }]} animation="slideInUp">
+            <Animatable.View
+                style={[styles.rootView, {
+                    width: this.screenWidth,
+                    height: this.screenHeight,
+                    paddingTop: this.isIphonexPortrait ? 34 : 0,
+                    paddingBottom: this.rootViewPaddingBottom
+                }]}
+                animation="slideInUp"
+                duration={400}>
                 <View style={styles.operationBar}>
                     <TouchableOpacity onPress={this.props.onCancel}>
                         <Image source={require("../images/text/cancel_typing.png")} style={styles.operationImage} />

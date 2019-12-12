@@ -63,14 +63,34 @@ class Container extends Component {
             isEdit: (this.props.isEditable && this.props.fullMode) ? true : false
         });
     }
+    /**
+     * 根据id查找item
+     *
+     * @memberof Container
+     */
+    _getItemById(id) {
+        let { items } = this.state;
+        for (let i = 0; i < items.length; i++) {
+            if (items[i].id === id) {
+                return items[i];
+            }
+        }
+    }
     needToListenerObjectEvent(object) {
         //let objectSelected = JSON.parse(object);
         //console.log(objectSelected);
-        this.setState({
-            itemSelectedId: object.selectedId,
-            itemSelected: object.selectedId ? true : false,
-            selectedObjectShape: object.selectedId ? object.shape : null
-        });
+        if (object.shape === "SketchpadText" && object.eventType === "DOUBLE_CLICK" && object.selectedId) {
+            this.currentSketchpadTextItem = this._getItemById(object.selectedId);
+            this.setState({
+                isEditingText: true
+            });
+        } else {
+            this.setState({
+                itemSelectedId: object.selectedId,
+                itemSelected: object.selectedId ? true : false,
+                selectedObjectShape: object.selectedId ? object.shape : null
+            });
+        }
     }
     needToListenerAddPathEvent(object) {
         // 收到监听后想做的事情 // 监听
@@ -164,7 +184,17 @@ class Container extends Component {
             return (
                 <View style={{ flex: 1, flexDirection: "row", height: ScreenWidth, paddingLeft: Utils.isIPhoneXPaddTop(true) }}>
                     <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
-                    <Sketchpad width={fullScreenBgWidth} height={sketchpadHeight} itemSelectedId={this.state.itemSelectedId} bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} attachObjectEvent={(object) => this.needToListenerObjectEvent(object)} attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)} />
+                    <Sketchpad
+                        isPortrait={this.state.isPortrait}
+                        width={fullScreenBgWidth}
+                        height={sketchpadHeight}
+                        itemSelectedId={this.state.itemSelectedId}
+                        bg={this.dataModel.background}
+                        items={this.state.items}
+                        isEdit={this.state.isEdit}
+                        attachObjectEvent={(object) => this.needToListenerObjectEvent(object)}
+                        attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)}
+                        onTextItemLayout={this.onTextItemLayout.bind(this)} />
                     {this.renderTool()}
                     {this.renderTextEditView()}
                 </View>
@@ -173,7 +203,17 @@ class Container extends Component {
             return (
                 <View style={{ flex: 1, flexDirection: "column", paddingTop: Utils.isIPhoneXPaddTop() }}>
                     <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
-                    <Sketchpad width={fullScreenBgWidth} height={sketchpadHeight} itemSelectedId={this.state.itemSelectedId} bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} attachObjectEvent={(object) => this.needToListenerObjectEvent(object)} attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)} />
+                    <Sketchpad
+                        isPortrait={this.state.isPortrait}
+                        width={fullScreenBgWidth}
+                        height={sketchpadHeight}
+                        itemSelectedId={this.state.itemSelectedId}
+                        bg={this.dataModel.background}
+                        items={this.state.items}
+                        isEdit={this.state.isEdit}
+                        attachObjectEvent={(object) => this.needToListenerObjectEvent(object)}
+                        attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)}
+                        onTextItemLayout={this.onTextItemLayout.bind(this)} />
                     {this.renderTool()}
                     {this.renderTextEditView()}
                 </View>
@@ -221,7 +261,9 @@ class Container extends Component {
             this.setState({
                 isEditingText: true
             });
-            this.newSketchpadTextItem = newItem;
+            // 设置文本位置,新建的文本应位于画布中央
+            newItem.y = this.state.isPortrait ? 1960 / 2 : 1251 / 2;
+            this.currentSketchpadTextItem = newItem;
         } else {
             let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
             newItems.push(newItem);
@@ -300,15 +342,36 @@ class Container extends Component {
      * @memberof Container
      */
     onConfirmTextEditing(newText) {
-        if (this.newSketchpadTextItem) {
-            this.newSketchpadTextItem.text = newText;
+        if (this.currentSketchpadTextItem) {
+            this.currentSketchpadTextItem.text = newText;
             let newItems = this.state.items;
-            newItems.push(this.newSketchpadTextItem);
+            // 如果是新建的文本，则添加到item里面
+            if (this.currentSketchpadTextItem.status === "drawing") {
+                newItems.push(this.currentSketchpadTextItem);
+            }
             this.setState({
                 itemSelected: null,
                 items: newItems,
                 selectedObjectShape: null,
                 isEditingText: false
+            });
+        }
+    }
+    /**
+     * 文本渲染完成后的回调函数
+     * 对于新建的文本，需要重新计算位置以确保它是在画布中央
+     *
+     * @param {*} item
+     * @param {*} layout
+     * @memberof Container
+     */
+    onTextItemLayout(item, layout) {
+        // 判断是否为新添加的文本
+        if (item.status === "drawing") {
+            let sketchWidth = this.state.isPortrait ? 1251 : 1960;
+            item.x = Math.max(0, (sketchWidth - layout.width) / 2);
+            this.setState({
+                items: this.state.items
             });
         }
     }
@@ -341,10 +404,17 @@ class Container extends Component {
             </View>
         )
     }
+    /**
+     * 渲染文本编辑框
+     *
+     * @returns
+     * @memberof Container
+     */
     renderTextEditView() {
         if (this.state.isEditingText) {
             return (
                 <TextEditArea
+                    data={this.currentSketchpadTextItem}
                     isPortrait={this.state.isPortrait}
                     onCancel={() => { this.setState({ isEditingText: false }) }}
                     onConfirm={this.onConfirmTextEditing.bind(this)} />
@@ -365,7 +435,7 @@ class Container extends Component {
         let canvasHeight = (this.needRotate) ? canvasWidth * (1251 / 1960) : canvasWidth * (1960 / 1251);
         return (<View style={{ width: canvasWidth, height: canvasHeight }}>
             <TouchableOpacity onPress={() => this.switchSizeMode()}>
-                <Sketchpad width="100%" height="100%" bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} />
+                <Sketchpad isPortrait={this.state.isPortrait} width="100%" height="100%" bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} />
             </TouchableOpacity>
             <Modal isVisible={this.state.isFull} supportedOrientations={['portrait', 'landscape']} style={{ backgroundColor: "#000", margin: 0 }} animationIn="fadeIn" animationOut="fadeOut">
                 {this.renderCanvasContent(fullScreenBgWidth, sketchpadHeight)}

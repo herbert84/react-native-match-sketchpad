@@ -64,7 +64,13 @@ class Sketchpad extends Component {
             case "SketchpadShape": item = <Item data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
             case "SketchpadStraightLine": item = <StraightLine selectedId={this.props.itemSelectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
             case "SketchpadCurvedLine": item = <CurvedLine selectedId={this.props.itemSelectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadText": item = <SketchText data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadText":
+                item = <SketchText
+                    data={data}
+                    selectedId={this.props.itemSelectedId}
+                    attachObjectEvent={(object) => this.attachObjectEvent(object)}
+                    onTextLayout={(layout) => this.props.onTextItemLayout ? this.props.onTextItemLayout(data, layout) : null} />;
+                break;
             case "SketchpadPolygon": item = <Polygon data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
             case "SketchpadRectangle": item = <Rectangle data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
             case "SketchpadEllipse": item = <Ellipse data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
@@ -82,7 +88,8 @@ class Sketchpad extends Component {
         //alert(this.props.isEdit)
         //console.log("is edit:" + this.props.isEdit);
         // 计算PC端画布的长宽和手机端画布的长宽之间的换算比例,变量名参照PC端的代码取名为ScaleFactor
-        SketchpadObject.prototype.scaleFactor = this.props.width === "100%" ? 400 / 1960 : this.props.width / 1960;
+        let originSketchWidth = this.props.isPortrait ? 1960 : 1960;
+        SketchpadObject.prototype.scaleFactor = this.props.width === "100%" ? 400 / originSketchWidth : this.props.width / originSketchWidth;
         SketchpadObject.prototype.isEdit = this.props.isEdit;
         //console.log(this.props.width + ":" + this.props.height);
         return (
