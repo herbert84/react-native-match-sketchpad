@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import { View, TouchableOpacity, Platform, Dimensions, StatusBar, Image as RNImage, FlatList } from "react-native";
 import PropTypes from 'prop-types';
+import * as _ from "lodash";
 import Modal from "react-native-modal";
 import Orientation from "react-native-orientation";
 import Sketchpad from "./Sketchpad";
 import Utils from "./Utils";
 import ToolBar from "../tool/ToolBar";
 import Global from "./Global";
-//import ToolElementItems from "../data/ToolElement";
 import DataModal from "./DataModel";
+import History from "./History";
+import TextEditArea from "../component/TextEditArea";
 
 const ScreenWidth = Dimensions.get("window").width;
 const ScreenHeight = Dimensions.get("window").height;
@@ -33,8 +35,10 @@ class Container extends Component {
         this.dataModel = JSON.parse(this.props.data);
         Global.instanceId = Utils.randomStringId(10);
         this.instanceId = Global.instanceId;
+        this.history = new History();
+        this.history.setInitialData(JSON.parse(JSON.stringify(this.dataModel.items)));
         this.state = {
-            items: this.dataModel.items,
+            items: JSON.parse(JSON.stringify(this.dataModel.items)),
             isFull: props.fullMode,
             isEdit: false,
             screenHeight: Dimensions.get("window").height,
@@ -45,7 +49,9 @@ class Container extends Component {
             itemSelected: false,
             selectedObjectShape: null,
             isPortrait: true,
-            itemSelectedId: null
+            itemSelectedId: null,
+            hasHistoryOperation: false,
+            isEditingText: false  //标识当前是不是在编辑文字
         }
         this.needRotate = true
     }
@@ -109,15 +115,19 @@ class Container extends Component {
         }
         this.setState({
             items: newItems
+        }, () => {
+            if (object.status === "done") {
+                this.continueDraw({ shape: object.shape, type: object.type ? object.type : null });
+            }
         })
-        if (object.status === "done") {
-            this.startDrawMode({ shape: object.shape, type: object.type ? object.type : null });
-        }
     }
     switchSizeMode() {
         this.setState({
             isFull: !this.state.isFull,
-            isEdit: (this.props.isEditable && !this.state.isFull) ? true : false
+            isEdit: (this.props.isEditable && !this.state.isFull) ? true : false,
+            statusBarHidden: (!this.state.isFull && this.needRotate) ? true : false,
+            isPortrait: this.needRotate ? false : true,
+            statusBarStyle: this.state.isFull ? "dark-content" : "light-content"
         }, () => {
             this.setScreenOrientation();
         })
@@ -131,23 +141,11 @@ class Container extends Component {
         if (this.state.isFull) {
             console.log(ScreenWidth + ":" + ScreenHeight)
             if (this.needRotate) {
-                this.setState({
-                    statusBarHidden: true,
-                    isPortrait: false
-                });
                 (Platform.OS === "android") ? Orientation.lockToLandscapeLeft() : Orientation.lockToLandscapeRight()
-            } else {
-                this.setState({
-                    statusBarStyle: "light-content"
-                })
             }
         } else {
-            this.setState({
-                statusBarHidden: false,
-                statusBarStyle: "dark-content",
-                isPortrait: true
-            })
-            this.finalizeDrawing();
+            if (this.state.action === "drawing")
+                this.finalizeDrawing(true);
             //console.log(ScreenWidth + ":" + ScreenHeight)
             Orientation.lockToPortrait();
         }
@@ -164,11 +162,11 @@ class Container extends Component {
         //alert(this.props.isEdit)
         if (this.needRotate) {
             return (
-                <View style={{ flex: 1, flexDirection: "row" }}>
+                <View style={{ flex: 1, flexDirection: "row", height: ScreenWidth, paddingLeft: Utils.isIPhoneXPaddTop(true) }}>
                     <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
-                    <View style={{ height: ScreenWidth, width: Utils.isIPhoneXPaddTop(true) }} />
                     <Sketchpad width={fullScreenBgWidth} height={sketchpadHeight} itemSelectedId={this.state.itemSelectedId} bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} attachObjectEvent={(object) => this.needToListenerObjectEvent(object)} attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)} />
                     {this.renderTool()}
+                    {this.renderTextEditView()}
                 </View>
             )
         } else {
@@ -177,9 +175,38 @@ class Container extends Component {
                     <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
                     <Sketchpad width={fullScreenBgWidth} height={sketchpadHeight} itemSelectedId={this.state.itemSelectedId} bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} attachObjectEvent={(object) => this.needToListenerObjectEvent(object)} attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)} />
                     {this.renderTool()}
+                    {this.renderTextEditView()}
                 </View>
             )
         }
+    }
+    continueDraw(item) {
+        let items = this.state.items;
+        let that = this;
+        let newItems = [];
+        for (var i in items) {
+            let shape = Utils.getItemType(items[i]);
+            if (items[i].status === "drawing" && shape !== "SketchpadShape") {
+                items[i].status = "done";
+            }
+            if (items[i].status !== "new" && items[i].status !== "drawing")
+                newItems.push(items[i])
+        }
+        that.history.addOperationData(JSON.parse(JSON.stringify(newItems)), "add");
+        let scale = this.props.width === "100%" ? 400 / 1960 : this.props.width / 1960;
+        let width = (this.needRotate) ? (1960 / 1251 * ScreenWidth / scale).toString() : ScreenWidth / scale.toString();
+        let height = (this.needRotate) ? ScreenWidth / scale.toString() : (1960 / 1251 * ScreenWidth / scale).toString();
+        let newItem = DataModal.addObject(item);
+        let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
+        newItems.push(newItem);
+        newItems.push(drawLayerItem);
+        this.setState({
+            items: newItems,
+            action: "drawing",
+            hasHistoryOperation: true,
+            itemSelected: null,
+            selectedObjectShape: null
+        });
     }
     startDrawMode(item) {
         // 点击创建物件时，取消选择当前画布所有物体
@@ -189,19 +216,27 @@ class Container extends Component {
         let width = (this.needRotate) ? (1960 / 1251 * ScreenWidth / scale).toString() : ScreenWidth / scale.toString();
         let height = (this.needRotate) ? ScreenWidth / scale.toString() : (1960 / 1251 * ScreenWidth / scale).toString();
         let newItem = DataModal.addObject(item);
-        let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
-        newItems.push(newItem);
-        newItems.push(drawLayerItem);
-
-        this.setState({
-            itemSelected: null,
-            items: newItems,
-            selectedObjectShape: null,
-            action: "drawing"
-        })
+        if (newItem.shape === "SketchpadText") {
+            // 编辑文字
+            this.setState({
+                isEditingText: true
+            });
+            this.newSketchpadTextItem = newItem;
+        } else {
+            let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
+            newItems.push(newItem);
+            newItems.push(drawLayerItem);
+            this.setState({
+                itemSelected: null,
+                items: newItems,
+                selectedObjectShape: null,
+                action: "drawing"
+            });
+        }
     }
-    finalizeDrawing() {
+    finalizeDrawing(needUpdateHistory) {
         let items = this.state.items;
+        let that = this;
         let newItems = [];
         for (var i in items) {
             let shape = Utils.getItemType(items[i]);
@@ -213,23 +248,110 @@ class Container extends Component {
         }
         this.setState({
             items: newItems,
-            action: "read"
+            action: "read",
+            hasHistoryOperation: true
+        }, () => {
+            if (needUpdateHistory)
+                that.history.addOperationData(JSON.parse(JSON.stringify(newItems)), "add");
         });
     }
+    /**
+     *
+     * @description 清空所有操作历史
+     * @memberof Container
+     */
+    removeHistory() {
+        this.history.backToInitialData();
+        let newItems = this.history.getAll();
+        this.setState({
+            items: JSON.parse(JSON.stringify(newItems[0].data)),
+            action: "read",
+            hasHistoryOperation: false
+        });
+    }
+    undoLastOperation() {
+        this.history.undoLastOperation();
+        let newItems = this.history.getAll();
+        let hasHistoryOperation = newItems.length - 1 > 0 ? true : false;
+        this.setState({
+            items: JSON.parse(JSON.stringify(newItems[newItems.length - 1].data)),
+            action: "read",
+            hasHistoryOperation
+        });
+    }
+    onPressToolBtn(newItems, type) {
+        let that = this;
+        this.setState({
+            items: newItems,
+            hasHistoryOperation: true
+        }, () => {
+            let targetObject = {
+                selectedId: type === "delete" ? null : this.state.itemSelectedId,
+                shape: type === "delete" ? null : this.state.selectedObjectShape,
+                itemSelected: type === "delete" ? false : true
+            }
+            this.needToListenerObjectEvent(targetObject);
+            that.history.addOperationData(JSON.parse(JSON.stringify(newItems)), type);
+        });
+    }
+    /**
+     * 文字编辑确认的响应函数
+     *
+     * @memberof Container
+     */
+    onConfirmTextEditing(newText) {
+        if (this.newSketchpadTextItem) {
+            this.newSketchpadTextItem.text = newText;
+            let newItems = this.state.items;
+            newItems.push(this.newSketchpadTextItem);
+            this.setState({
+                itemSelected: null,
+                items: newItems,
+                selectedObjectShape: null,
+                isEditingText: false
+            });
+        }
+    }
     renderTool() {
+        let that = this;
+        let elementIndex = _.findIndex(this.state.items, function (item) { return item.id === that.state.itemSelectedId; });
+        let itemIsTop = (elementIndex === this.state.items.length - 1) ? true : false;
+        let itemIsBottom = elementIndex === 0 ? true : false;
         return (
             <View style={{ flexDirection: "row" }}>
                 <ToolBar
-                    isPortrait={this.state.isPortrait}
-                    isEdit={this.state.isEdit}
-                    action={this.state.action}
-                    itemSelected={this.state.itemSelected}
-                    selectedObjectShape={this.state.selectedObjectShape}
-                    startDrawMode={(item) => this.startDrawMode(item)}
-                    onPressSwitchSize={() => this.switchSizeMode()}
-                    onPressConfirmDrawing={() => this.finalizeDrawing()} />
+                    isPortrait={this.state.isPortrait} //当前是否是横竖屏
+                    items={this.state.items} //当前画布的元素
+                    itemSelectedId={this.state.itemSelectedId} //当前选中的物体id
+                    itemSelected={this.state.itemSelected} //当前是否有物体被选中
+                    itemIsTop={itemIsTop} // 选中物体是否是堆栈最上层
+                    itemIsBottom={itemIsBottom} //选中物体是否是堆栈最底层
+                    selectedObjectShape={this.state.selectedObjectShape} //被选中物体的类型
+                    isEdit={this.state.isEdit} //当前是否在编辑状态
+                    action={this.state.action} //当前画布的状态
+                    history={this.history} //当前操作历史
+                    hasHistory={this.state.hasHistoryOperation} //当前是否有操作历史
+                    removeHistory={() => this.removeHistory()} //移除所有操作历史
+                    undoLastOperation={() => this.undoLastOperation()} //返回上一次操作
+                    startDrawMode={(item) => this.startDrawMode(item)} //开始画图
+                    onPressTool={(newItems, type) => this.onPressToolBtn(newItems, type)} //选中物体后点击操作按钮的回调函数
+                    onPressSwitchSize={() => this.switchSizeMode()} //切换屏幕全屏至缩略图
+                    onPressConfirmDrawing={(needUpdateHistory) => this.finalizeDrawing(needUpdateHistory)} //结束当前类型画图
+                />
             </View>
         )
+    }
+    renderTextEditView() {
+        if (this.state.isEditingText) {
+            return (
+                <TextEditArea
+                    isPortrait={this.state.isPortrait}
+                    onCancel={() => { this.setState({ isEditingText: false }) }}
+                    onConfirm={this.onConfirmTextEditing.bind(this)} />
+            );
+        } else {
+            return null;
+        }
     }
     render() {
         const bgImage = RNImage.resolveAssetSource(Utils.loadImage(this.dataModel.background[0].image));

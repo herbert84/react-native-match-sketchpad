@@ -23,28 +23,8 @@ class SketchObject extends Component {
         this.initShape(false)
     }
     componentDidMount() {
-        //监听物体对象被点击的事件，如果当前物体id等于被点击的对象id，则当前被选中且添加矩形背景，如果不是则不被选中且无矩形背景
         console.log("this.isEdit:" + this.isEdit)
-        /*if (this.isEdit) {
-            this.objectListener = DeviceEventEmitter.addListener("sketchobject_" + Global.instanceId, (object) => {
-                // 收到监听后想做的事情 // 监听
-                let objectSelected = JSON.parse(object);
-                //console.log(objectSelected);
-                this.setState({
-                    isSelected: objectSelected.selectedId === this.props.data.id
-                });
-            });
-        }*/
     }
-    /*objectSelectedListener(object) {
-        if (this.isEdit) {
-            let objectSelected = JSON.parse(object);
-            //console.log(objectSelected);
-            this.setState({
-                isSelected: objectSelected.selectedId === this.props.data.id
-            });
-        }
-    }*/
     componentWillReceiveProps(nextProps) {
         if (nextProps.selectedId === this.props.data.id) {
             console.log("found and selected")
@@ -81,6 +61,7 @@ class SketchObject extends Component {
                 this.state = {
                     x: this.props.data.x * this.scaleFactor,
                     y: this.props.data.y * this.scaleFactor,
+                    rotation: this.props.data.rotation,
                     isSelected
                 }
                 break;
@@ -216,6 +197,8 @@ class SketchObject extends Component {
                         ref={ele => { this.root = ele; }}
                         x={rect.x}
                         y={rect.y}
+                        origin={rect.width / 2, rect.height / 2}
+                        rotation={rect.rotation}
                     >
                         {this.renderSelectedArea(rect.width, rect.height)}
                         {item}
@@ -225,8 +208,10 @@ class SketchObject extends Component {
                 return (
                     <G
                         ref={ele => { this.root = ele; }}
+                        origin={rect.width / 2, rect.height / 2}
                         x={this.state.x}
                         y={this.state.y}
+                        rotation={this.state.rotation}
                         {...this._panResponder.panHandlers}
                     >
                         {this.renderSelectedArea(rect.width, rect.height)}
@@ -239,6 +224,8 @@ class SketchObject extends Component {
                 ref={ele => { this.root = ele; }}
                 x={this.state.x}
                 y={this.state.y}
+                origin={rect.width / 2, rect.height / 2}
+                rotation={this.state.rotation}
             >
                 {item}
             </G>)

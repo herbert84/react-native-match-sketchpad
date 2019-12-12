@@ -1,112 +1,180 @@
 const ToolElementSelectedItems = {
     "SketchpadShape": [{
         "title": "放大",
-        "image": "tooltipEnlarge"
+        "image": "tooltipEnlarge",
+        "key": "enlarge",
+        "isDisabled": false
     }, {
         "title": "缩小",
-        "image": "tooltipReduce"
+        "image": "tooltipReduce",
+        "key": "reduce",
+        "isDisabled": false
     }, {
         "title": "旋转",
-        "image": "tooltipRotate"
+        "image": "tooltipRotate",
+        "key": "rotation",
+        "isDisabled": false
     }, {
         "title": "反向",
-        "image": "tooltipMirror"
+        "image": "tooltipMirror",
+        "key": "mirror",
+        "isDisabled": false
     }, {
         "title": "上层",
-        "image": "tooltipMoveUp"
+        "image": "tooltipMoveUp",
+        "key": "moveup",
+        "isDisabled": false
     }, {
         "title": "下层",
-        "image": "tooltipMoveDown"
+        "image": "tooltipMoveDown",
+        "key": "movedown",
+        "isDisabled": false
     }, {
         "title": "复制",
-        "image": "tooltipDuplicate"
+        "image": "tooltipDuplicate",
+        "key": "duplicate",
+        "isDisabled": false
     }, {
         "title": "删除",
-        "image": "tooltipDelete"
+        "image": "tooltipDelete",
+        "key": "delete",
+        "isDisabled": false
     }],
     "SketchpadStraightLine": [{
         "title": "上层",
-        "image": "tooltipMoveUp"
+        "image": "tooltipMoveUp",
+        "key": "moveup",
+        "isDisabled": false
     }, {
         "title": "下层",
-        "image": "tooltipMoveDown"
+        "image": "tooltipMoveDown",
+        "key": "movedown",
+        "isDisabled": false
     }, {
         "title": "复制",
-        "image": "tooltipDuplicate"
+        "image": "tooltipDuplicate",
+        "key": "duplicate",
+        "isDisabled": false
     }, {
         "title": "删除",
-        "image": "tooltipDelete"
+        "image": "tooltipDelete",
+        "key": "delete",
+        "isDisabled": false
     }],
     "SketchpadCurvedLine": [{
         "title": "上层",
-        "image": "tooltipMoveUp"
+        "image": "tooltipMoveUp",
+        "key": "moveup",
+        "isDisabled": false
     }, {
         "title": "下层",
-        "image": "tooltipMoveDown"
+        "image": "tooltipMoveDown",
+        "key": "movedown",
+        "isDisabled": false
     }, {
         "title": "复制",
-        "image": "tooltipDuplicate"
+        "image": "tooltipDuplicate",
+        "key": "duplicate",
+        "isDisabled": false
     }, {
         "title": "删除",
-        "image": "tooltipDelete"
+        "image": "tooltipDelete",
+        "key": "delete",
+        "isDisabled": false
     }],
     "SketchpadText": [{
         "title": "放大",
-        "image": "tooltipEnlarge"
+        "image": "tooltipEnlarge",
+        "key": "enlarge",
+        "isDisabled": false
     }, {
         "title": "缩小",
-        "image": "tooltipReduce"
+        "image": "tooltipReduce",
+        "key": "reduce",
+        "isDisabled": false
     }, {
         "title": "上层",
-        "image": "tooltipMoveUp"
+        "image": "tooltipMoveUp",
+        "key": "moveup",
+        "isDisabled": false
     }, {
         "title": "下层",
-        "image": "tooltipMoveDown"
+        "image": "tooltipMoveDown",
+        "key": "movedown",
+        "isDisabled": false
     }, {
         "title": "复制",
-        "image": "tooltipDuplicate"
+        "image": "tooltipDuplicate",
+        "key": "duplicate",
+        "isDisabled": false
     }, {
         "title": "删除",
-        "image": "tooltipDelete"
+        "image": "tooltipDelete",
+        "key": "delete",
+        "isDisabled": false
     }],
     "SketchpadPolygon": [{
         "title": "上层",
-        "image": "tooltipMoveUp"
+        "image": "tooltipMoveUp",
+        "key": "moveup",
+        "isDisabled": false
     }, {
         "title": "下层",
-        "image": "tooltipMoveDown"
+        "image": "tooltipMoveDown",
+        "key": "movedown",
+        "isDisabled": false
     }, {
         "title": "复制",
-        "image": "tooltipDuplicate"
+        "image": "tooltipDuplicate",
+        "key": "duplicate",
+        "isDisabled": false
     }, {
         "title": "删除",
-        "image": "tooltipDelete"
+        "image": "tooltipDelete",
+        "key": "delete",
+        "isDisabled": false
     }],
     "SketchpadRectangle": [{
         "title": "上层",
-        "image": "tooltipMoveUp"
+        "image": "tooltipMoveUp",
+        "key": "moveup",
+        "isDisabled": false
     }, {
         "title": "下层",
-        "image": "tooltipMoveDown"
+        "image": "tooltipMoveDown",
+        "key": "movedown",
+        "isDisabled": false
     }, {
         "title": "复制",
-        "image": "tooltipDuplicate"
+        "image": "tooltipDuplicate",
+        "key": "duplicate",
+        "isDisabled": false
     }, {
         "title": "删除",
-        "image": "tooltipDelete"
+        "image": "tooltipDelete",
+        "key": "delete",
+        "isDisabled": false
     }],
     "SketchpadEllipse": [{
         "title": "上层",
-        "image": "tooltipMoveUp"
+        "image": "tooltipMoveUp",
+        "key": "moveup",
+        "isDisabled": false
     }, {
         "title": "下层",
-        "image": "tooltipMoveDown"
+        "image": "tooltipMoveDown",
+        "key": "movedown",
+        "isDisabled": false
     }, {
         "title": "复制",
-        "image": "tooltipDuplicate"
+        "image": "tooltipDuplicate",
+        "key": "duplicate",
+        "isDisabled": false
     }, {
         "title": "删除",
-        "image": "tooltipDelete"
+        "image": "tooltipDelete",
+        "key": "delete",
+        "isDisabled": false
     }]
 }
 export default ToolElementSelectedItems;

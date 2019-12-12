@@ -22,7 +22,7 @@ class SketchText extends SketchObject {
         super(props);
     }
     getSizeByHeight() {
-        return 20 * this.scaleFactor * this.props.data.scale;
+        return 50 * this.scaleFactor * this.props.data.scale;
     }
     render() {
         //console.log(this.props.data)

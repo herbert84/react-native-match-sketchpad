@@ -3,7 +3,6 @@ import { View, DeviceEventEmitter } from "react-native";
 import PropTypes from 'prop-types';
 import { Svg, Image } from 'react-native-svg';
 import Utils from "./Utils";
-import Global from "./Global";
 
 class Background extends Component {
     static propTypes = {

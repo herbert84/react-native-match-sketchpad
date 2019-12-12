@@ -30,7 +30,8 @@ class Item extends SketchObject {
             x: this.props.data.x * this.scaleFactor,
             y: this.props.data.y * this.scaleFactor,
             width: rectWidth,
-            height: rectHeight
+            height: rectHeight,
+            rotation: this.props.data.rotation
         }
         //console.log(bgImage)
         //console.log(this.state.x + ":" + this.state.y);
