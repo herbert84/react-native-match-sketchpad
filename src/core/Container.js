@@ -163,6 +163,9 @@ class Container extends Component {
             if (this.needRotate) {
                 (Platform.OS === "android") ? Orientation.lockToLandscapeLeft() : Orientation.lockToLandscapeRight()
             }
+            this.setState({
+                isPortrait: !this.needRotate
+            });
         } else {
             if (this.state.action === "drawing")
                 this.finalizeDrawing(true);

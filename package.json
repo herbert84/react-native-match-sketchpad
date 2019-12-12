@@ -1,6 +1,6 @@
 {
     "name": "react-native-match-sketchpad",
-    "version": "0.12.13",
+    "version": "0.12.12",
     "main": "index.js",
     "dependencies": {
         "react-native-svg": "^9.13.3",
