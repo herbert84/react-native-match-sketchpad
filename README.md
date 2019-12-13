@@ -15,6 +15,8 @@ let sketchData = '{"background": [{"image": "/sap/sports/fnd/appsvc/resources/se
 
 let width = Dimension.get("window").width;
 
+let isEditMode = true;
+
 <View>
 ...
 <Sketchpad fullMode={false} data={sketchData} isEditable={isEditMode} width={width} />
