@@ -8,14 +8,16 @@ class Sketchpad extends Component {
         fullMode: PropTypes.bool, // "true/false"
         renderTools: PropTypes.bool, // true/false,
         isEditable: PropTypes.bool,
-        data: PropTypes.string
+        data: PropTypes.string,
+        language: PropTypes.string //en, zh
     };
 
     static defaultProps = {
         fullMode: false,
         renderTools: false,
         isEditable: false,
-        data: '{"background": [{"image": "/sap/sports/fnd/appsvc/resources/service/resources.xsjs/SKETCHPAD_BACKGROUND","scaleFactor": 1}],"items": []}'
+        data: '{"background": [{"image": "/sap/sports/fnd/appsvc/resources/service/resources.xsjs/SKETCHPAD_BACKGROUND","scaleFactor": 1}],"items": []}',
+        language: "en"
     };
     constructor(props) {
         super(props);
@@ -31,7 +33,7 @@ class Sketchpad extends Component {
     }
     render() {
         return (<View>
-            <Container data={this.props.data} fullMode={this.props.fullMode} isEditable={this.props.isEditable} width={this.props.width} />
+            <Container data={this.props.data} fullMode={this.props.fullMode} isEditable={this.props.isEditable} width={this.props.width} language={this.props.language} onExportToImage={(base64, cb) => this.props.onExportToImage(base64, cb)} />
             {this.renderTools()}
         </View>)
     }

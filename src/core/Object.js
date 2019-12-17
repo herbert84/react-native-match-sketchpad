@@ -20,6 +20,9 @@ class SketchObject extends Component {
     constructor(props) {
         super(props);
         this._panResponder = {};
+        this.state = {
+            isSelected: false
+        }
         this.initShape(false)
     }
     componentDidMount() {
@@ -29,6 +32,8 @@ class SketchObject extends Component {
         if (nextProps.selectedId === this.props.data.id) {
             console.log("found and selected")
             this.initShape(true)
+
+            this.addDraggableResponder()
         } else {
             this.initShape(false)
         }
@@ -69,7 +74,7 @@ class SketchObject extends Component {
         }
     }
     componentWillMount = () => {
-        this.addDraggableResponder()
+        //this.addDraggableResponder()
     };
     addDraggableResponder() {
         if (this.props.data.status !== "new" && this.props.data.status !== "drawing") {

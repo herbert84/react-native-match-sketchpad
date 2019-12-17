@@ -3,7 +3,15 @@ import { TouchableOpacity, View, Image, Text } from "react-native";
 
 class Button extends Component {
     renderLabel() {
-        return this.props.label ? (<Text style={{ color: "#FFF", width: this.props.isPortrait ? "auto" : 20, alignItems: "center", textAlign: "center" }}>{this.props.label}</Text>) : null;
+        if (this.props.label) {
+            if (this.props.language.indexOf("en") > -1) {
+                return (<Text style={{ color: "#FFF", width: "auto", alignItems: "center", textAlign: "center" }}>{this.props.label}</Text>)
+            } else {
+                return (<Text style={{ color: "#FFF", width: this.props.isPortrait ? "auto" : 20, alignItems: "center", textAlign: "center" }}>{this.props.label}</Text>)
+            }
+        } else {
+            return null;
+        }
     }
     renderBtnContent(width, height) {
         if (this.props.isDisabled) {

@@ -11,6 +11,8 @@ import Polygon from "../element/Polygon";
 import SketchText from "../element/Text";
 import Rectangle from "../element/Rectangle";
 import Ellipse from "../element/Ellipse";
+import DataModal from "./DataModel";
+import DataModel from './DataModel';
 
 class Sketchpad extends Component {
     static propTypes = {
@@ -54,27 +56,28 @@ class Sketchpad extends Component {
         }
         return a;
     }
-    getItem(className, data) {
+    getItem(className, originData) {
+        let data = DataModel.recalculateItem(originData, SketchpadObject.prototype.offsetX);
         let classNameArray = className.split(".");
         let itemName = classNameArray[classNameArray.length - 1];
         //console.log(itemName)
         let item = null;
         switch (itemName) {
             case "SketchpadNew": item = <DrawLayer data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} attachAddPathEvent={(object) => this.attachAddPathEvent(object)} />; break;
-            case "SketchpadShape": item = <Item data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadStraightLine": item = <StraightLine selectedId={this.props.itemSelectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadCurvedLine": item = <CurvedLine selectedId={this.props.itemSelectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadShape": item = <Item data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadStraightLine": item = <StraightLine selectedId={this.props.selectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadCurvedLine": item = <CurvedLine selectedId={this.props.selectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
             case "SketchpadText":
                 item = <SketchText
                     data={data}
-                    selectedId={this.props.itemSelectedId}
+                    selectedId={this.props.selectedId}
                     attachObjectEvent={(object) => this.attachObjectEvent(object)}
                     onTextLayout={(layout) => this.props.onTextItemLayout ? this.props.onTextItemLayout(data, layout) : null} />;
                 break;
-            case "SketchpadPolygon": item = <Polygon data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadRectangle": item = <Rectangle data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadEllipse": item = <Ellipse data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            default: item = <Item data={data} selectedId={this.props.itemSelectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadPolygon": item = <Polygon data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadRectangle": item = <Rectangle data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadEllipse": item = <Ellipse data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            default: item = <Item data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
         }
         return item;
     }
@@ -85,15 +88,17 @@ class Sketchpad extends Component {
         this.props.attachAddPathEvent && this.props.attachAddPathEvent(object);
     }
     render() {
-        //alert(this.props.isEdit)
-        //console.log("is edit:" + this.props.isEdit);
         // 计算PC端画布的长宽和手机端画布的长宽之间的换算比例,变量名参照PC端的代码取名为ScaleFactor
-        let originSketchWidth = this.props.isPortrait ? 1960 : 1960;
-        SketchpadObject.prototype.scaleFactor = this.props.width === "100%" ? 400 / originSketchWidth : this.props.width / originSketchWidth;
+        let originSketchHeight = 1251;
+        let scaleFactor = this.props.height / originSketchHeight;
+        SketchpadObject.prototype.scaleFactor = scaleFactor;
         SketchpadObject.prototype.isEdit = this.props.isEdit;
-        //console.log(this.props.width + ":" + this.props.height);
+        SketchpadObject.prototype.offsetX = DataModel.getOffsetX(this.props.bg[0].image);
         return (
-            <Svg height={this.props.height} width={this.props.width}>
+            <Svg
+                ref={ref => this.props.onSvgRef(ref)}
+                height={this.props.height}
+                width={this.props.width}>
                 <Background bg={this.props.bg} width={this.props.width} height={this.props.height} isEdit={this.props.isEdit} attachObjectEvent={(object) => this.attachObjectEvent(object)} />
                 {this.renderItems()}
             </Svg>

@@ -1,11 +1,13 @@
 import { Platform, Dimensions } from "react-native";
 import * as _ from "lodash";
+import { zh } from "../i18n/zh";
+import { en } from "../i18n/en";
 import ImageList from "./ImageList";
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
 console.log("screenSize:" + deviceHeight + "/" + deviceWidth);
 const Utils = {
-    loadImage(className) {
+    loadImage(className, isMirror = false) {
         if (className) {
             let bgImageUrlArray = className.split("/");
             let bgImageUrl = bgImageUrlArray[bgImageUrlArray.length - 1];
@@ -13,7 +15,7 @@ const Utils = {
                 return require("../images/field1.png");
             } else {
                 let imageName = bgImageUrl.split(".");
-                return ImageList[imageName[0]];
+                return isMirror ? ImageList[imageName[0] + "_m"] : ImageList[imageName[0]];
             }
         } else {
             return require("../images/field1.png");
@@ -108,6 +110,9 @@ const Utils = {
             newPoints.push(pointsArray[i].y + moveY);
         }
         return newPoints;
+    },
+    getTranslatedText(type, key, language) {
+        return language.indexOf("zh") > -1 ? zh[type][key] : en[type][key];
     }
 }
 

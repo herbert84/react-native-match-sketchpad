@@ -1,18 +1,18 @@
 const ToolElementItems = [{
     "title": "元素",
     "showTitle": true,
-    "key": "Element",
+    "key": "ELEMENT",
     "image": "tool",
     "nodes": [
         {
             "title": "元素",
             "showTitle": true,
-            "key": "Element",
+            "key": "ELEMENT",
             "image": "tool"
         },
         {
             "title": "线条",
-            "key": "SketchpadLine",
+            "key": "LINE",
             "image": "toolLine",
             "nodes": [
                 {
@@ -219,12 +219,13 @@ const ToolElementItems = [{
         },
         {
             "title": "区域",
-            "key": "SketchpadZone",
+            "key": "AREAS",
             "image": "toolArea",
             "nodes": [
                 {
                     "title": "自由多边形",
                     "shape": "SketchpadPolygon",
+                    "key": "POLYGON",
                     "image": {
                         "Vertical": "polygonVertical",
                         "Horizontal": "polygonHorizontal"
@@ -233,6 +234,7 @@ const ToolElementItems = [{
                 {
                     "title": "矩形",
                     "shape": "SketchpadRectangle",
+                    "key": "RECTANGLE",
                     "image": {
                         "Vertical": "rectangleVertical",
                         "Horizontal": "rectangleHorizontal"
@@ -241,6 +243,7 @@ const ToolElementItems = [{
                 {
                     "title": "椭圆形",
                     "shape": "SketchpadEllipse",
+                    "key": "CYCLE",
                     "image": {
                         "Vertical": "ellipseVertical",
                         "Horizontal": "ellipseHorizontal"
@@ -256,7 +259,7 @@ const ToolElementItems = [{
         },
         {
             "title": "球员",
-            "key": "SketchpadPlayer",
+            "key": "PLAYERS",
             "image": "toolPlayer",
             "nodes": [
                 {
@@ -407,7 +410,7 @@ const ToolElementItems = [{
         },
         {
             "title": "物品",
-            "key": "SketchpadMaterial",
+            "key": "FIELDITEMS",
             "image": "toolFieldItem",
             "nodes": [
                 {

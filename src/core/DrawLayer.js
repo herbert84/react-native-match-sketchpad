@@ -1,11 +1,16 @@
 import React, { Component } from 'react';
-import { PanResponder, DeviceEventEmitter, Image as RNImage } from "react-native";
+import { PanResponder, Image as RNImage } from "react-native";
 import SketchObject from "../core/Object";
-import { Svg, G, Path, Rect } from 'react-native-svg';
+import { G, Path, Rect } from 'react-native-svg';
 import * as _ from "lodash";
 import Utils from "./Utils";
-import Global from "./Global";
 
+/**
+ *
+ * @description 在画布上绘制图形的绘制层，所有在画布上的添加动作都在这个蒙层上进行。当结束绘制后该蒙层将被删除
+ * @class DrawLayer
+ * @extends {SketchObject}
+ */
 class DrawLayer extends SketchObject {
     constructor(props) {
         super(props);
@@ -40,7 +45,6 @@ class DrawLayer extends SketchObject {
                 height: Math.abs(targetY - originY) / this.scaleFactor
             }
             this.props.attachAddPathEvent(path);
-            //DeviceEventEmitter.emit("sketchAddPath_" + Global.instanceId, JSON.stringify(path))
         } else if (this.props.data.shape === "SketchpadStraightLine") {
             let path = {
                 type: this.props.data.type,
@@ -51,7 +55,6 @@ class DrawLayer extends SketchObject {
                 shape: this.props.data.shape
             }
             this.props.attachAddPathEvent(path);
-            //DeviceEventEmitter.emit("sketchAddPath_" + Global.instanceId, JSON.stringify(path))
         }
     };
     _handlePanDrawResponderEnd = (e, gestureState) => {
@@ -68,7 +71,6 @@ class DrawLayer extends SketchObject {
                 y: e.nativeEvent.locationY / this.scaleFactor
             }
             this.props.attachAddPathEvent(path);
-            //DeviceEventEmitter.emit("sketchAddPath_" + Global.instanceId, JSON.stringify(path))
         } else if (shape === "SketchpadShape") {
             const bgImage = RNImage.resolveAssetSource(Utils.loadImage(this.props.data.data.image));
             let rectWidth = bgImage.width * this.props.data.data.scale;
@@ -81,7 +83,6 @@ class DrawLayer extends SketchObject {
                 status: "done"
             }
             return this.props.attachAddPathEvent(path);
-            //DeviceEventEmitter.emit("sketchAddPath_" + Global.instanceId, JSON.stringify(path))
         } else if (shape === "SketchpadRectangle" || shape === "SketchpadEllipse") {
             let path = {
                 shape: this.props.data.shape,
@@ -93,7 +94,6 @@ class DrawLayer extends SketchObject {
                 status: "done"
             }
             this.props.attachAddPathEvent(path);
-            //DeviceEventEmitter.emit("sketchAddPath_" + Global.instanceId, JSON.stringify(path))
         } else if (shape === "SketchpadStraightLine") {
             let path = {
                 shape: this.props.data.shape,
@@ -105,7 +105,6 @@ class DrawLayer extends SketchObject {
                 status: "done"
             }
             this.props.attachAddPathEvent(path);
-            //DeviceEventEmitter.emit("sketchAddPath_" + Global.instanceId, JSON.stringify(path))
         } else if (shape === "SketchpadCurvedLine") {
             let path = {
                 shape: this.props.data.shape,
@@ -114,7 +113,6 @@ class DrawLayer extends SketchObject {
                 y: e.nativeEvent.locationY / this.scaleFactor
             }
             this.props.attachAddPathEvent(path);
-            //DeviceEventEmitter.emit("sketchAddPath_" + Global.instanceId, JSON.stringify(path))
         }
     }
     render() {

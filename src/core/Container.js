@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, TouchableOpacity, Platform, Dimensions, StatusBar, Image as RNImage, FlatList } from "react-native";
+import { View, TouchableOpacity, Platform, Dimensions, StatusBar, Image as RNImage } from "react-native";
 import PropTypes from 'prop-types';
 import * as _ from "lodash";
 import Modal from "react-native-modal";
@@ -11,6 +11,7 @@ import Global from "./Global";
 import DataModal from "./DataModel";
 import History from "./History";
 import TextEditArea from "../component/TextEditArea";
+import Toast from "../component/Toast";
 
 const ScreenWidth = Dimensions.get("window").width;
 const ScreenHeight = Dimensions.get("window").height;
@@ -20,7 +21,8 @@ class Container extends Component {
         width: PropTypes.number,
         height: PropTypes.string,
         isEditable: PropTypes.bool, //当前画布是否允许编辑
-        isEdit: PropTypes.bool //当前画布是否在编辑状态
+        isEdit: PropTypes.bool, //当前画布是否在编辑状态,
+        language: PropTypes.string
     };
 
     static defaultProps = {
@@ -28,7 +30,8 @@ class Container extends Component {
         width: 400,
         height: parseInt(400 / 1960 * 1251),
         isEditable: false,
-        isEdit: false
+        isEdit: false,
+        language: "en"
     };
     constructor(props) {
         super(props);
@@ -43,7 +46,6 @@ class Container extends Component {
             isEdit: false,
             screenHeight: Dimensions.get("window").height,
             screenWidth: Dimensions.get("window").width,
-            statusBarHidden: true,
             statusBarStyle: "dark-content",
             action: "read", //当前画板出于的行为，诸如read, drawing, edit等等,
             itemSelected: false,
@@ -96,7 +98,7 @@ class Container extends Component {
         // 收到监听后想做的事情 // 监听
         //let objectSelected = JSON.parse(object);
         //console.log(objectSelected);
-        let items = this.state.items;
+        let items = JSON.parse(JSON.stringify(this.state.items));
         let newItems = [];
         for (var i in items) {
             if (items[i].status === "drawing") {
@@ -141,16 +143,23 @@ class Container extends Component {
             }
         })
     }
+    /**
+     *
+     * @description 切换视图模式，全屏/缩略图。为了解决安卓下横竖屏切换会造成弹出蒙层无法点击的bug。因此将机制改为先横屏，然后在更新蒙层及画布内容。
+     * @memberof Container
+     */
     switchSizeMode() {
+        if (!this.state.isFull && this.needRotate) {
+            (Platform.OS === "android") ? Orientation.lockToLandscapeLeft() : Orientation.lockToLandscapeRight()
+        } else {
+            Orientation.lockToPortrait();
+        }
         this.setState({
             isFull: !this.state.isFull,
             isEdit: (this.props.isEditable && !this.state.isFull) ? true : false,
-            statusBarHidden: (!this.state.isFull && this.needRotate) ? true : false,
             isPortrait: this.needRotate ? false : true,
             statusBarStyle: this.state.isFull ? "dark-content" : "light-content"
-        }, () => {
-            this.setScreenOrientation();
-        })
+        });
     }
     /**
      * 根据模式设置屏幕为横竖屏
@@ -173,6 +182,20 @@ class Container extends Component {
             Orientation.lockToPortrait();
         }
     }
+    renderSketchpad(fullScreenBgWidth, sketchpadHeight) {
+        return (<Sketchpad
+            onSvgRef={(svgRef) => this.svgRef = svgRef}
+            isPortrait={this.state.isPortrait}
+            width={fullScreenBgWidth}
+            height={sketchpadHeight}
+            selectedId={this.state.itemSelectedId}
+            bg={this.dataModel.background}
+            items={this.state.items}
+            isEdit={this.state.isEdit}
+            attachObjectEvent={(object) => this.needToListenerObjectEvent(object)}
+            attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)}
+            onTextItemLayout={this.onTextItemLayout.bind(this)} />)
+    }
     /**
      *
      * @description 渲染canvas画布内容，需要旋转时隐藏状态栏，不旋转时显示状态栏
@@ -185,41 +208,23 @@ class Container extends Component {
         //alert(this.props.isEdit)
         if (this.needRotate) {
             return (
-                <View style={{ flex: 1, flexDirection: "row", height: ScreenWidth, paddingLeft: Utils.isIPhoneXPaddTop(true) }}>
-                    <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
-                    <Sketchpad
-                        isPortrait={this.state.isPortrait}
-                        width={fullScreenBgWidth}
-                        height={sketchpadHeight}
-                        itemSelectedId={this.state.itemSelectedId}
-                        bg={this.dataModel.background}
-                        items={this.state.items}
-                        isEdit={this.state.isEdit}
-                        attachObjectEvent={(object) => this.needToListenerObjectEvent(object)}
-                        attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)}
-                        onTextItemLayout={this.onTextItemLayout.bind(this)} />
+                <View style={{ width: ScreenHeight, backgroundColor: "#000", flexDirection: "row", height: ScreenWidth, paddingLeft: Utils.isIPhoneXPaddTop(true) }}>
+                    <StatusBar translucent hidden={true} />
+                    {this.renderSketchpad(fullScreenBgWidth, sketchpadHeight)}
                     {this.renderTool()}
                     {this.renderTextEditView()}
-                </View>
+                    {this.renderToast(fullScreenBgWidth, sketchpadHeight)}
+                </View >
             )
         } else {
             return (
                 <View style={{ flex: 1, flexDirection: "column", paddingTop: Utils.isIPhoneXPaddTop() }}>
-                    <StatusBar translucent hidden={this.state.statusBarHidden} barStyle={this.state.statusBarStyle} />
-                    <Sketchpad
-                        isPortrait={this.state.isPortrait}
-                        width={fullScreenBgWidth}
-                        height={sketchpadHeight}
-                        itemSelectedId={this.state.itemSelectedId}
-                        bg={this.dataModel.background}
-                        items={this.state.items}
-                        isEdit={this.state.isEdit}
-                        attachObjectEvent={(object) => this.needToListenerObjectEvent(object)}
-                        attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)}
-                        onTextItemLayout={this.onTextItemLayout.bind(this)} />
+                    <StatusBar translucent hidden={false} barStyle={this.state.statusBarStyle} />
+                    {this.renderSketchpad(fullScreenBgWidth, sketchpadHeight)}
                     {this.renderTool()}
                     {this.renderTextEditView()}
-                </View>
+                    {this.renderToast(fullScreenBgWidth, sketchpadHeight)}
+                </View >
             )
         }
     }
@@ -324,6 +329,31 @@ class Container extends Component {
             hasHistoryOperation
         });
     }
+    /**
+     * 另存为图片, 保存时须将base64字符串的前缀加上
+     *
+     * @memberof Container
+     */
+    exportToImage() {
+        if (this.svgRef) {
+            this.svgRef.toDataURL(base64 => {
+                if (this.props.onExportToImage) {
+                    this.props.onExportToImage("data:image/png;base64," + base64, this.cbExportToImageFinished.bind(this));
+                }
+            });
+        }
+    }
+    /**
+     * 导出成功之后的回调函数
+     *
+     * @memberof Container
+     */
+    cbExportToImageFinished(message, duration) {
+        Toast.show({
+            text: message,
+            duration: duration
+        });
+    }
     onPressToolBtn(newItems, type) {
         let that = this;
         this.setState({
@@ -386,6 +416,7 @@ class Container extends Component {
         return (
             <View style={{ flexDirection: "row" }}>
                 <ToolBar
+                    language={this.props.language}
                     isPortrait={this.state.isPortrait} //当前是否是横竖屏
                     items={this.state.items} //当前画布的元素
                     itemSelectedId={this.state.itemSelectedId} //当前选中的物体id
@@ -398,6 +429,7 @@ class Container extends Component {
                     history={this.history} //当前操作历史
                     hasHistory={this.state.hasHistoryOperation} //当前是否有操作历史
                     removeHistory={() => this.removeHistory()} //移除所有操作历史
+                    exportToImage={() => this.exportToImage()}  //保存为图片
                     undoLastOperation={() => this.undoLastOperation()} //返回上一次操作
                     startDrawMode={(item) => this.startDrawMode(item)} //开始画图
                     onPressTool={(newItems, type) => this.onPressToolBtn(newItems, type)} //选中物体后点击操作按钮的回调函数
@@ -426,6 +458,15 @@ class Container extends Component {
             return null;
         }
     }
+    renderToast(sketchpadWidth, sketchpadHeight) {
+        return (
+            <Toast
+                ref={c => Toast.toastInstance = c}
+                sketchpadWidth={parseFloat(sketchpadWidth)}
+                sketchpadHeight={parseFloat(sketchpadHeight)}
+                isPortrait={this.state.isPortrait}></Toast>
+        );
+    }
     render() {
         const bgImage = RNImage.resolveAssetSource(Utils.loadImage(this.dataModel.background[0].image));
         //计算是否当前画布需要旋转，如果是背景图片宽度大于高度，则全屏时需要旋转，如果是宽度小于高度，则全屏时不旋转
@@ -438,7 +479,14 @@ class Container extends Component {
         let canvasHeight = (this.needRotate) ? canvasWidth * (1251 / 1960) : canvasWidth * (1960 / 1251);
         return (<View style={{ width: canvasWidth, height: canvasHeight }}>
             <TouchableOpacity onPress={() => this.switchSizeMode()}>
-                <Sketchpad isPortrait={this.state.isPortrait} width="100%" height="100%" bg={this.dataModel.background} items={this.state.items} isEdit={this.state.isEdit} />
+                <Sketchpad
+                    onSvgRef={(svgRef) => this.svgRef = svgRef}
+                    isPortrait={this.state.isPortrait}
+                    width={canvasWidth}
+                    height={canvasHeight}
+                    bg={this.dataModel.background}
+                    items={this.state.items}
+                    isEdit={this.state.isEdit} />
             </TouchableOpacity>
             <Modal isVisible={this.state.isFull} supportedOrientations={['portrait', 'landscape']} style={{ backgroundColor: "#000", margin: 0 }} animationIn="fadeIn" animationOut="fadeOut">
                 {this.renderCanvasContent(fullScreenBgWidth, sketchpadHeight)}

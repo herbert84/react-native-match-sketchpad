@@ -43,7 +43,7 @@ class Item extends SketchObject {
                 y="0"
                 width={bgImage.width * this.scaleFactor * this.props.data.scale}
                 height={bgImage.height * this.scaleFactor * this.props.data.scale}
-                href={Utils.loadImage(this.props.data.image)}
+                href={Utils.loadImage(this.props.data.image, this.props.data.mirror)}
                 onPress={() => this.objectOnPress()}
             />, rect)
         }

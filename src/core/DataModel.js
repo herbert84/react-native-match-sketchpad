@@ -196,5 +196,38 @@ class DataModel {
         }
         return newObject;
     }
+    /**
+     * 由于战术板在PC端的实现方式是：无论选择横屏还是竖屏的背景尺寸，画布区域的长宽始终都是 1960 x 1251；
+     * 而在APP端，战术板横屏模式的长宽是 1960 x 1251，而竖屏模式的长宽则为 800 x 1251
+     * 因此当PC端的数据在APP端展示的时候，需要考虑竖屏模式下的X轴上的偏移量，以确保图形能够在背景图片的相对位置上正确显示
+     *
+     * @memberof DataModel
+     */
+    getOffsetX(bgImage) {
+        //竖屏模式要计算偏移量
+        if (bgImage === "/sap/sports/trm/ui/catalog/images/field6.png") {
+            return (1960 - 798.46) / 2;
+        }
+        return 0;
+    }
+    /**
+     * 根据X轴的偏移量重新计算item的坐标
+     *
+     * @memberof DataModel
+     */
+    recalculateItem(item, offsetX) {
+        //copy一个新的对象来存放item
+        let newItem = JSON.parse(JSON.stringify(item));
+        //处理points数组中的X坐标
+        if (newItem.points) {
+            for (let i = 0; i < newItem.points.length - 1; i += 2) {
+                newItem.points[i] = newItem.points[i] - offsetX;
+            }
+        }
+        if (newItem.x) {
+            newItem.x = newItem.x - offsetX;
+        }
+        return newItem;
+    }
 }
 export default new DataModel();

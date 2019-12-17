@@ -6,7 +6,13 @@ class MirrorTool extends Component {
     onPress() {
         let itemSelectedId = this.props.itemSelectedId;
         let items = this.props.items;
-        let newItems = items;
+        let newItems = [];
+        for (var i in items) {
+            if (items[i].id === itemSelectedId) {
+                items[i].mirror = !items[i].mirror;
+            }
+            newItems.push(items[i])
+        }
         this.props.onPress(newItems);
     }
     render() {

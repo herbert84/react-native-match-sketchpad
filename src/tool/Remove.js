@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ActionSheetIOS, Alert, Platform } from 'react-native';
 import Button from "../component/Button";
+import Utils from "../core/Utils";
 import AppImageList from "../core/AppImageList";
 
 class Remove extends Component {
@@ -9,8 +10,8 @@ class Remove extends Component {
         if (Platform.OS === "ios") {
             ActionSheetIOS.showActionSheetWithOptions({
                 options: [
-                    '清空草图上所有绘制元素',
-                    '取消',
+                    Utils.getTranslatedText("MESSAGE", "DELETE_CONFIRM_IOS", that.props.language),
+                    Utils.getTranslatedText("BUTTON", "DIALOG_CANCEL", that.props.language),
                 ],
                 cancelButtonIndex: 1,
                 destructiveButtonIndex: 0
@@ -22,10 +23,10 @@ class Remove extends Component {
         } else {
             Alert.alert(
                 '',
-                '清空草图上所有绘制元素',
+                Utils.getTranslatedText("MESSAGE", "DELETE_CONFIRM_ANDROID", that.props.language),
                 [
-                    { text: '取消', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
-                    { text: '确定', onPress: () => that.props.onPress() }
+                    { text: Utils.getTranslatedText("BUTTON", "DIALOG_CANCEL", that.props.language), onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+                    { text: Utils.getTranslatedText("BUTTON", "DIALOG_DELETE", that.props.language), onPress: () => that.props.onPress() }
                 ],
                 { cancelable: false }
             )

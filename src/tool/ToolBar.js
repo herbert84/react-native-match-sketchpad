@@ -46,12 +46,12 @@ class ToolBar extends Component {
     }
     _keyExtractor = (item, index) => Utils.randomStringId(10);
     onPressElementItem(item) {
-        if (item.key !== "Element") {
+        if (item.key !== "ELEMENT") {
             if (item.nodes) {
                 this.setState({
                     expandElementItems: true,
                     showItemsModal: true,
-                    showItemsModalLabel: item.title,
+                    showItemsModalLabel: Utils.getTranslatedText("LABEL", item.key, this.props.language),
                     showItemsModalShape: item.key,
                     showItemsModalIcon: item.image,
                     activeItem: item,
@@ -79,11 +79,12 @@ class ToolBar extends Component {
     }
     expandElement(item) {
         let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image
-        let dynamicWH = item.key === "Element" ? 94 : parseInt((ScreenWidth - 32 - 94) / 5);
+        let dynamicWH = item.key === "ELEMENT" ? 94 : parseInt((ScreenWidth - 32 - 94) / 5);
         let width = this.props.isPortrait ? dynamicWH : 36;
         let height = this.props.isPortrait ? 36 : dynamicWH;
+        let title = Utils.getTranslatedText("LABEL", item.key, this.props.language)
 
-        return <View style={{ width, height, alignItems: "center", justifyContent: "center" }}><Button isPortrait={this.props.isPortrait} imageSource={AppImageList[img]} onPress={() => this.onPressElementItem(item)} label={item.showTitle ? item.title : null} /></View>
+        return <View style={{ width, height, alignItems: "center", justifyContent: "center" }}><Button isPortrait={this.props.isPortrait} imageSource={AppImageList[img]} onPress={() => this.onPressElementItem(item)} label={item.showTitle ? title : null} language={this.props.language} /></View>
     }
     renderToolItem(item) {
         let itemStyle = this.props.isPortrait ? { marginRight: 22 } : { marginBottom: 22 };
@@ -121,9 +122,18 @@ class ToolBar extends Component {
     renderShapeItem(item) {
         let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image;
         const bgImage = Image.resolveAssetSource(AppImageList[img]);
+        let key = this.state.showItemsModalShape;
         let imgWidth = bgImage.width / 2;
         let imgHeight = bgImage.height / 2;
-        return <View key={Utils.randomStringId(10)} style={{ backgroundColor: "#484848", marginRight: 8, marginBottom: 8, width: imgWidth, height: imgHeight }}><Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} /></View>
+        if (key === "AREAS") {
+            let textStyle = this.props.isPortrait ? { position: "absolute", bottom: 12, color: "#FFF", fontSize: 12 } : { position: "absolute", right: 24, color: "#FFF", top: 27, fontSize: 12 }
+            return <View key={Utils.randomStringId(10)} style={{ backgroundColor: "#484848", marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight }}>
+                <Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} />
+                <Text style={textStyle} onPress={() => this.onPressElementItem(item)}>{Utils.getTranslatedText("LABEL", item.key, this.props.language)}</Text>
+            </View>
+        } else {
+            return <View key={Utils.randomStringId(10)} style={{ backgroundColor: "#484848", marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight }}><Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} /></View>
+        }
     }
     /**
      *
@@ -132,9 +142,10 @@ class ToolBar extends Component {
      * @memberof ToolBar
      */
     renderShapeSelectModalToolBar() {
-        return (<View style={{ flexDirection: "row", padding: 16, "justifyContent": "space-between" }}>
+        let paddingLeftRight = this.props.isPortrait ? 16 : 24;
+        return (<View style={{ flexDirection: "row", paddingTop: 16, paddingBottom: 16, paddingLeft: paddingLeftRight, paddingRight: paddingLeftRight, "justifyContent": "space-between" }}>
             <Text style={styles.modalLabel}>{this.state.showItemsModalLabel}</Text>
-            <Text style={styles.modalLabel} onPress={() => this.setState({ showItemsModal: false })}>返回</Text>
+            <Text style={styles.modalLabel} onPress={() => this.setState({ showItemsModal: false })}>{Utils.getTranslatedText("BUTTON", "CANCEL", this.props.language)}</Text>
         </View>)
     }
     /**
@@ -146,11 +157,11 @@ class ToolBar extends Component {
     renderItemsContent() {
         if (this.props.isPortrait) {
             //竖屏模式下，如果是线条，则显示四行，如果是区域则显示一行，否则显示两行
-            let contentHeight = this.state.showItemsModalShape === "SketchpadLine" ? 296 : 187;
-            let numColumns = (this.state.showItemsModalShape === "SketchpadLine") ? Math.ceil(this.state.showShapeItems.length / 4) : this.state.showItemsModalShape === "SketchpadZone" ? 3 : Math.ceil(this.state.showShapeItems.length / 2);
+            let contentHeight = this.state.showItemsModalShape === "LINE" ? 296 : 187;
+            let numColumns = (this.state.showItemsModalShape === "LINE") ? Math.ceil(this.state.showShapeItems.length / 4) : this.state.showItemsModalShape === "AREAS" ? 3 : Math.ceil(this.state.showShapeItems.length / 2);
             return (<View style={{ position: "absolute", bottom: 0, height: contentHeight, width: "100%", backgroundColor: "#000" }}>
                 {this.renderShapeSelectModalToolBar()}
-                <ScrollView style={{ flexDirection: "row", paddingLeft: 16, paddingRight: 16 }} horizontal={true}>
+                <ScrollView style={{ flexDirection: "row", paddingLeft: 16, paddingRight: 8 }} horizontal={true}>
                     <FlatList
                         data={this.state.showShapeItems}
                         keyExtractor={this._keyExtractor}
@@ -179,8 +190,10 @@ class ToolBar extends Component {
         for (var i in shapeItems) {
             result.push(this.renderShapeItem(shapeItems[i]))
         }
+        let marginLeft = this.props.isPortrait ? 16 : 24;
+        let marginRight = this.props.isPortrait ? 8 : 16;
         return <ScrollView
-            style={{ marginLeft: 16, marginRight: 8, height: ScreenWidth - 32 - 21 }}
+            style={{ marginLeft: marginLeft, marginRight: marginRight, height: ScreenWidth - 32 - 21 }}
             showsVerticalScrollIndicator={false}>
             <View style={{ width: 197, flexDirection: "row", flexWrap: 'wrap' }}>{result}</View></ScrollView>
     }
@@ -221,9 +234,9 @@ class ToolBar extends Component {
                     />
                 </View>
                 <View style={styles.essentialBtnContainerInPortrait}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
-                    <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.download} />
+                    <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
                 </View>
             </View >)
@@ -235,14 +248,14 @@ class ToolBar extends Component {
                     <Button onPress={() => this.finalizeDrawing()} imageSource={AppImageList.endDrawing} />
                 </View>
                 <View style={styles.essentialBtnContainerInPortrait}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
-                    <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.download} />
+                    <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} /></View>
             </View>)
         } else {
-            return (<View style={styles.containerEditReadInPortrait}>
-                <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.download} />
+            return (<View style={[styles.containerEditReadInPortrait, { width: 126 }]}>
+                <Button style={{ marginRight: 22 }} onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                 <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} /></View>)
         }
     }
@@ -264,9 +277,9 @@ class ToolBar extends Component {
                     />
                 </View>
                 <View style={styles.essentialBtnContainerInLandscape}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
-                    <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.download} />
+                    <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
                 </View></View >)
         }
@@ -277,15 +290,15 @@ class ToolBar extends Component {
                     <Button onPress={() => this.finalizeDrawing()} imageSource={AppImageList.endDrawing} />
                 </View>
                 <View style={styles.essentialBtnContainerInLandscape}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
-                    <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.download} />
+                    <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
                 </View>
             </View >)
         } else {
-            return (<View style={styles.containerEditReadInLandscape}>
-                <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.download} />
+            return (<View style={[styles.containerEditReadInLandscape, { height: 126 }]}>
+                <Button style={{ marginBottom: 22 }} onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                 <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} /></View>)
         }
     }
