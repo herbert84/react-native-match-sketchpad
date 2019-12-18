@@ -11,8 +11,6 @@ import Polygon from "../element/Polygon";
 import SketchText from "../element/Text";
 import Rectangle from "../element/Rectangle";
 import Ellipse from "../element/Ellipse";
-import DataModal from "./DataModel";
-import DataModel from './DataModel';
 
 class Sketchpad extends Component {
     static propTypes = {
@@ -56,8 +54,7 @@ class Sketchpad extends Component {
         }
         return a;
     }
-    getItem(className, originData) {
-        let data = DataModel.recalculateItem(originData, SketchpadObject.prototype.offsetX);
+    getItem(className, data) {
         let classNameArray = className.split(".");
         let itemName = classNameArray[classNameArray.length - 1];
         //console.log(itemName)
@@ -89,11 +86,13 @@ class Sketchpad extends Component {
     }
     render() {
         // 计算PC端画布的长宽和手机端画布的长宽之间的换算比例,变量名参照PC端的代码取名为ScaleFactor
+        //let originSketchHeight = 1251;
+        //let originSketchWidth = this.props.isPortrait ? 1960 : 798;
+        //let scaleFactor = this.props.width === "100%" ? 400 / originSketchWidth : this.props.width / originSketchWidth;
         let originSketchHeight = 1251;
         let scaleFactor = this.props.height / originSketchHeight;
         SketchpadObject.prototype.scaleFactor = scaleFactor;
         SketchpadObject.prototype.isEdit = this.props.isEdit;
-        SketchpadObject.prototype.offsetX = DataModel.getOffsetX(this.props.bg[0].image);
         return (
             <Svg
                 ref={ref => this.props.onSvgRef(ref)}

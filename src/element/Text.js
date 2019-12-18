@@ -41,38 +41,57 @@ class SketchText extends SketchObject {
         };
     }
     getSizeByHeight() {
-        return 50 * this.scaleFactor * this.props.data.scale;
+        return 40 * this.scaleFactor * this.props.data.scale;
     }
     onPressText() {
+        let currentPressCount = this.state.pressTextCount ? this.state.pressTextCount : 0;
         this.setState({
-            pressTextCount: this.state.pressTextCount + 1
+            pressTextCount: currentPressCount + 1
         });
         this.firePressEvent();
     }
     onTextLayout(event) {
         console.log(event.nativeEvent.layout);
         console.log(this.props.data.text);
+        let { layout } = event.nativeEvent;
         let { x, y, width, height } = event.nativeEvent.layout;
         if (!(x === 0 && y === 0 && height === 0)) {
-            this.setState({
-                isTextRendered: true,
-                touchAreaHeight: height,
-                touchAreaWidth: width,
-                touchAreaX: x,
-                touchAreaY: y
-            });
+            if (this.props.data.status === "drawing") {
+                this.props.onTextLayout && this.props.onTextLayout(layout);
+            } else {
+                this.setState({
+                    isTextRendered: true,
+                    touchAreaHeight: height,
+                    touchAreaWidth: width,
+                    touchAreaX: x,
+                    touchAreaY: y
+                });
+            }
         }
-        this.props.onTextLayout ? this.props.onTextLayout(event.nativeEvent.layout) : null;
+    }
+    renderTextInContainer() {
+        return (
+            <Text
+                x="0"
+                y="0"
+                fontFamily={this.props.data.font}
+                fontSize={this.getSizeByHeight()}
+                textAnchor="start"
+                opacity={this.props.data.status === "drawing" ? "0" : "1"}
+                onPress={this.onPressText.bind(this)}>
+                {this.props.data.text}
+            </Text>
+        );
     }
     renderText() {
         return (
             <Text
                 x={this.props.data.x * this.scaleFactor}
                 y={this.props.data.y * this.scaleFactor}
-                width={50}
                 fontFamily={this.props.data.font}
                 fontSize={this.getSizeByHeight()}
                 textAnchor="start"
+                opacity={this.props.data.status === "drawing" ? "0" : "1"}
                 onPress={this.onPressText.bind(this)}
                 onLayout={this.onTextLayout.bind(this)}>
                 {this.props.data.text}
@@ -80,18 +99,18 @@ class SketchText extends SketchObject {
         );
     }
     renderTouchArea() {
-        if (this.state.isTextRendered) {
+        if (this.state.isTextRendered && this.isEdit && this.props.data.status !== "drawing") {
             return (
-                <Rect x={this.state.touchAreaX}
-                    y={this.state.touchAreaY}
+                <Rect x="0"
+                    y={0 - this.state.touchAreaHeight}
                     width={this.state.touchAreaWidth}
                     height={this.state.touchAreaHeight}
-                    fill="none"
+                    fill="rgb(0, 0, 0)"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="0"
                     stroke={this.props.data.color}
-                    opacity="0"
+                    opacity={this.state.isSelected ? "0.15" : "0"}
                     onPress={this.onPressText.bind(this)}
                 />
             );
@@ -99,11 +118,39 @@ class SketchText extends SketchObject {
             return null;
         }
     }
+    textContainer(items) {
+        if (this.isEdit) {
+            return (
+                <G
+                    ref={ele => { this.root = ele; }}
+                    x={this.state.x}
+                    y={this.state.y}
+                    {...this._panResponder.panHandlers}
+                >
+                    {items}
+                </G>
+            )
+        } else {
+            return (<G
+                ref={ele => { this.root = ele; }}
+                x={this.state.x}
+                y={this.state.y}
+            >
+                {items}
+            </G>)
+        }
+    }
     render() {
         let result = [];
-        result.push(this.renderText());
-        result.push(this.renderTouchArea());
-        return result;
+        if (this.props.data.status === "drawing" || !this.state.isTextRendered) {
+            result.push(this.renderText());
+            return result;
+        } else {
+            result.push(this.renderTouchArea());
+            result.push(this.renderTextInContainer());
+
+            return this.textContainer(result);
+        }
     }
 }
 export default SketchText;

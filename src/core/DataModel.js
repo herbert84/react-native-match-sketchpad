@@ -229,5 +229,22 @@ class DataModel {
         }
         return newItem;
     }
+    recalculateItems(items, offsetX) {
+        let newItems = [];
+        for (var i in items) {
+            let newItem = JSON.parse(JSON.stringify(item));
+            //处理points数组中的X坐标
+            if (newItem.points) {
+                for (let i = 0; i < newItem.points.length - 1; i += 2) {
+                    newItem.points[i] = newItem.points[i] - offsetX;
+                }
+            }
+            if (newItem.x) {
+                newItem.x = newItem.x - offsetX;
+            }
+            newItems.push(items[i])
+        }
+        return newItems;
+    }
 }
 export default new DataModel();

@@ -77,7 +77,7 @@ class StraightLine extends Line {
         let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
 
         if (isTouchArea) {
-            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 20} fill="none" onPress={() => this.objectOnPress()} />;
+            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 10} fill="none" onPress={() => this.objectOnPress()} />;
         } else {
             return <Path d={pathData} stroke={color} strokeDasharray={this.strokeDasharray} strokeWidth={width} fill="none" />;
         }
@@ -101,7 +101,7 @@ class StraightLine extends Line {
         let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
 
         if (isTouchArea) {
-            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 20} fill="none" onPress={() => this.objectOnPress()} />;
+            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 10} fill="none" onPress={() => this.objectOnPress()} />;
         } else {
             return <Path d={pathData} stroke={color} strokeDasharray={this.strokeDasharray} strokeWidth={width} fill="none" />;
         }
@@ -140,7 +140,7 @@ class StraightLine extends Line {
         let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
         let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
         if (isTouchArea) {
-            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 20} fill="none" onPress={() => this.objectOnPress()} />;
+            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 10} fill="none" onPress={() => this.objectOnPress()} />;
         } else {
             return <Path d={pathData} stroke={color} strokeDasharray={this.strokeDasharray} strokeWidth={width} fill="none" />;
         }

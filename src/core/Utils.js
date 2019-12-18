@@ -113,6 +113,30 @@ const Utils = {
     },
     getTranslatedText(type, key, language) {
         return language.indexOf("zh") > -1 ? zh[type][key] : en[type][key];
+    },
+    getOffsetX(bgImage) {
+        //竖屏模式要计算偏移量
+        if (bgImage === "/sap/sports/trm/ui/catalog/images/field6.png") {
+            return (1960 - 798.46) / 2;
+        }
+        return 0;
+    },
+    recalculateItems(items, offsetX) {
+        let newItems = [];
+        for (var i in items) {
+            let newItem = JSON.parse(JSON.stringify(items[i]));
+            //处理points数组中的X坐标
+            if (newItem.points) {
+                for (let i = 0; i < newItem.points.length - 1; i += 2) {
+                    newItem.points[i] = newItem.points[i] - offsetX;
+                }
+            }
+            if (newItem.x) {
+                newItem.x = newItem.x - offsetX;
+            }
+            newItems.push(newItem)
+        }
+        return newItems;
     }
 }
 

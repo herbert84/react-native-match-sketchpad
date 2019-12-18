@@ -63,57 +63,38 @@ class DrawLayer extends SketchObject {
         let targetX = (gestureState.dx >= 0) ? e.nativeEvent.locationX : e.nativeEvent.locationX - gestureState.dx;
         let targetY = (gestureState.dy >= 0) ? e.nativeEvent.locationY : e.nativeEvent.locationY - gestureState.dy;
         let shape = this.props.data.shape;
+        let path = {
+            shape: this.props.data.shape,
+            type: this.props.data.type
+        }
         if (shape === "SketchpadPolygon") {
-            let path = {
-                shape: this.props.data.shape,
-                type: this.props.data.type,
-                x: e.nativeEvent.locationX / this.scaleFactor,
-                y: e.nativeEvent.locationY / this.scaleFactor
-            }
-            this.props.attachAddPathEvent(path);
+            path.x = e.nativeEvent.locationX / this.scaleFactor;
+            path.y = e.nativeEvent.locationY / this.scaleFactor;
+
         } else if (shape === "SketchpadShape") {
             const bgImage = RNImage.resolveAssetSource(Utils.loadImage(this.props.data.data.image));
             let rectWidth = bgImage.width * this.props.data.data.scale;
             let rectHeight = bgImage.height * this.props.data.data.scale;
-            let path = {
-                type: this.props.data.type,
-                x: (e.nativeEvent.locationX / this.scaleFactor) - rectWidth / 2,
-                y: (e.nativeEvent.locationY / this.scaleFactor) - rectHeight / 2,
-                shape: this.props.data.shape,
-                status: "done"
-            }
-            return this.props.attachAddPathEvent(path);
+            path.x = (e.nativeEvent.locationX / this.scaleFactor) - rectWidth / 2;
+            path.y = (e.nativeEvent.locationY / this.scaleFactor) - rectHeight / 2;
+            path.status = "done";
         } else if (shape === "SketchpadRectangle" || shape === "SketchpadEllipse") {
-            let path = {
-                shape: this.props.data.shape,
-                type: this.props.data.type,
-                x: originX / this.scaleFactor,
-                y: originY / this.scaleFactor,
-                width: Math.abs(targetX - originX) / this.scaleFactor,
-                height: Math.abs(targetY - originY) / this.scaleFactor,
-                status: "done"
-            }
-            this.props.attachAddPathEvent(path);
+            path.x = originX / this.scaleFactor;
+            path.y = originY / this.scaleFactor;
+            path.width = Math.abs(targetX - originX) / this.scaleFactor;
+            path.height = Math.abs(targetY - originY) / this.scaleFactor;
+            path.status = "done";
         } else if (shape === "SketchpadStraightLine") {
-            let path = {
-                shape: this.props.data.shape,
-                type: this.props.data.type,
-                startX: originX / this.scaleFactor,
-                startY: originY / this.scaleFactor,
-                endX: targetX / this.scaleFactor,
-                endY: targetY / this.scaleFactor,
-                status: "done"
-            }
-            this.props.attachAddPathEvent(path);
+            path.startX = originX / this.scaleFactor;
+            path.startY = originY / this.scaleFactor;
+            path.endX = targetX / this.scaleFactor;
+            path.endY = targetY / this.scaleFactor;
+            path.status = "done";
         } else if (shape === "SketchpadCurvedLine") {
-            let path = {
-                shape: this.props.data.shape,
-                type: this.props.data.type,
-                x: e.nativeEvent.locationX / this.scaleFactor,
-                y: e.nativeEvent.locationY / this.scaleFactor
-            }
-            this.props.attachAddPathEvent(path);
+            path.x = e.nativeEvent.locationX / this.scaleFactor;
+            path.y = e.nativeEvent.locationY / this.scaleFactor;
         }
+        this.props.attachAddPathEvent(path);
     }
     render() {
         //let result = [];

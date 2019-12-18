@@ -7,7 +7,6 @@ import Orientation from "react-native-orientation";
 import Sketchpad from "./Sketchpad";
 import Utils from "./Utils";
 import ToolBar from "../tool/ToolBar";
-import Global from "./Global";
 import DataModal from "./DataModel";
 import History from "./History";
 import TextEditArea from "../component/TextEditArea";
@@ -36,12 +35,15 @@ class Container extends Component {
     constructor(props) {
         super(props);
         this.dataModel = JSON.parse(this.props.data);
-        Global.instanceId = Utils.randomStringId(10);
-        this.instanceId = Global.instanceId;
+        this.offsetX = Utils.getOffsetX(this.dataModel.background[0].image);
+        let convertedItems = Utils.recalculateItems(this.dataModel.items, this.offsetX);
+        //let convertedItems = this.dataModel.items;
+        //Global.instanceId = Utils.randomStringId(10);
+        //this.instanceId = Global.instanceId;
         this.history = new History();
-        this.history.setInitialData(JSON.parse(JSON.stringify(this.dataModel.items)));
+        this.history.setInitialData(JSON.parse(JSON.stringify(convertedItems)));
         this.state = {
-            items: JSON.parse(JSON.stringify(this.dataModel.items)),
+            items: JSON.parse(JSON.stringify(convertedItems)),
             isFull: props.fullMode,
             isEdit: false,
             screenHeight: Dimensions.get("window").height,
@@ -270,7 +272,7 @@ class Container extends Component {
                 isEditingText: true
             });
             // 设置文本位置,新建的文本应位于画布中央
-            newItem.y = this.state.isPortrait ? 1960 / 2 : 1251 / 2;
+            newItem.y = 1251 / 2;
             this.currentSketchpadTextItem = newItem;
         } else {
             let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
@@ -401,8 +403,12 @@ class Container extends Component {
     onTextItemLayout(item, layout) {
         // 判断是否为新添加的文本
         if (item.status === "drawing") {
-            let sketchWidth = this.state.isPortrait ? 1251 : 1960;
-            item.x = Math.max(0, (sketchWidth - layout.width) / 2);
+            this.state.items.forEach(element => {
+                if (element.id === item.id) {
+                    element.x = Math.max(0, (1960 - this.offsetX * 2 - layout.width) / 2);
+                    element.status = "done";
+                }
+            });
             this.setState({
                 items: this.state.items
             });

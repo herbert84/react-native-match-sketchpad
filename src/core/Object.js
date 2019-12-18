@@ -63,6 +63,7 @@ class SketchObject extends Component {
             case "SketchpadEllipse":
             case "SketchpadShape":
             case "SketchpadRectangle":
+            case "SketchpadText":
                 this.state = {
                     x: this.props.data.x * this.scaleFactor,
                     y: this.props.data.y * this.scaleFactor,
@@ -139,7 +140,7 @@ class SketchObject extends Component {
                 newPoints.push(pointsArray[i].y + deltaY);
             }
             this.props.data.points = newPoints;
-        } else if (shape === "SketchpadShape" || shape === "SketchpadRectangle") {
+        } else if (shape === "SketchpadShape" || shape === "SketchpadRectangle" || shape === "SketchpadEllipse" || shape === "SketchpadText") {
             this.props.data.x = this.state.x / this.scaleFactor;
             this.props.data.y = this.state.y / this.scaleFactor;
         }
