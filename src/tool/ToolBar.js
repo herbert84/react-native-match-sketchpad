@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, Text, ScrollView, Dimensions, Image, Animated, TouchableOpacity } from "react-native";
+import { View, FlatList, Text, ScrollView, Dimensions, Image, Animated, Easing, TouchableOpacity } from "react-native";
 import * as _ from "lodash";
 import Utils from "../core/Utils";
 import Button from "../component/Button";
@@ -38,7 +38,8 @@ class ToolBar extends Component {
             itemSelectedIsBottom: false,
             itemSelectedId: null,
             itemSelected: false,
-            securetyTipViewY: new Animated.Value(ScreenHeight)
+            elementToolBarX: new Animated.Value(94),
+            shapeToolBarX: new Animated.Value(ScreenHeight)
         }
     }
     componentWillReceiveProps(newProps) {
@@ -49,12 +50,13 @@ class ToolBar extends Component {
     }
     //展示View
     _showTipView = () => {
-        let topMargin = ScreenWidth * 1960 / 1251;
+        //let topMargin = ScreenWidth * 1960 / 1251;
         Animated.timing(
-            this.state.securetyTipViewY,
+            this.state.elementToolBarX,
             {
-                toValue: -topMargin - Utils.getPhoneTopDistance(),
-                duration: 1000,   //动画时长300毫秒
+                toValue: ScreenWidth - 32,
+                duration: 300,   //动画时长300毫秒,
+                easing: Easing.linear
             }
         ).start();
     }
@@ -62,10 +64,33 @@ class ToolBar extends Component {
     //隐藏view
     _hiddenTipView = () => {
         Animated.timing(
-            this.state.securetyTipViewY,
+            this.state.elementToolBarX,
+            {
+                toValue: 94,
+                duration: 300,   //动画时长300毫秒,
+                easing: Easing.linear
+            }).start();
+    }
+    _showShapeTipView = () => {
+        let topMargin = ScreenWidth * 1960 / 1251;
+        Animated.timing(
+            this.state.shapeToolBarX,
+            {
+                toValue: -topMargin - Utils.getPhoneTopDistance(),
+                duration: 300,   //动画时长300毫秒,
+                easing: Easing.linear
+            }
+        ).start();
+    }
+
+    //隐藏view
+    _hiddenShapeTipView = () => {
+        Animated.timing(
+            this.state.shapeToolBarX,
             {
                 toValue: ScreenHeight,
-                duration: 1000,   //动画时长300毫秒
+                duration: 300,   //动画时长300毫秒,
+                easing: Easing.linear
             }).start();
     }
     _keyExtractor = (item, index) => Utils.randomStringId(10);
@@ -81,11 +106,12 @@ class ToolBar extends Component {
                     activeItem: item,
                     showShapeItems: item.nodes
                 });
+                this._showShapeTipView();
             } else {
                 this.setState({
                     showItemsModal: false
                 });
-
+                this._hiddenShapeTipView();
                 item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
                 item.backgroundColor = ColorMappings[this.state.selectedColorIndex].backgroundColor;  //设置选中的颜色
                 this.props.startDrawMode(item)
@@ -174,7 +200,7 @@ class ToolBar extends Component {
         let paddingLeftRight = this.props.isPortrait ? 16 : 24;
         return (<View style={{ flexDirection: "row", paddingTop: 16, paddingBottom: 16, paddingLeft: paddingLeftRight, paddingRight: paddingLeftRight, "justifyContent": "space-between" }}>
             <Text style={styles.modalLabel}>{this.state.showItemsModalLabel}</Text>
-            <Text style={styles.modalLabel} onPress={() => { this.setState({ showItemsModal: false }); this._hiddenTipView(); }}>{Utils.getTranslatedText("BUTTON", "CANCEL", this.props.language)}</Text>
+            <Text style={styles.modalLabel} onPress={() => { this.setState({ showItemsModal: false }); }}>{Utils.getTranslatedText("BUTTON", "CANCEL", this.props.language)}</Text>
         </View>)
     }
     /**
@@ -307,7 +333,7 @@ class ToolBar extends Component {
         else if (this.props.isEdit && this.props.action === "read") {
             let btnElementWidth = this.state.expandElementItems ? (ScreenWidth - 32) : 94
             return (<View style={styles.containerEditReadInPortrait}>
-                <View style={[styles.elementContainer, { marginRight: btnElementMarginRightBottom, width: btnElementWidth }]}>
+                <Animated.View style={[styles.elementContainer, { marginRight: btnElementMarginRightBottom, width: this.state.elementToolBarX }]}>
                     <FlatList
                         data={this.state.showElementItems}
                         keyExtractor={this._keyExtractor}
@@ -315,7 +341,7 @@ class ToolBar extends Component {
                         scrollEnabled={false}
                         renderItem={({ item }) => this.expandElement(item)}
                     />
-                </View>
+                </Animated.View>
                 <View style={styles.essentialBtnContainerInPortrait}>
                     <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
@@ -351,14 +377,14 @@ class ToolBar extends Component {
         else if (this.props.isEdit && this.props.action === "read") {
             let btnElementHeight = this.state.expandElementItems ? (ScreenWidth - 32) : 94
             return (<View style={styles.containerEditReadInLandscape}>
-                <View style={[styles.elementContainer, { marginBottom: btnElementMarginRightBottom, height: btnElementHeight }]}>
+                <Animated.View style={[styles.elementContainer, { marginBottom: btnElementMarginRightBottom, height: this.state.elementToolBarX }]}>
                     <FlatList
                         data={this.state.showElementItems}
                         keyExtractor={this._keyExtractor}
                         scrollEnabled={false}
                         renderItem={({ item }) => this.expandElement(item)}
                     />
-                </View>
+                </Animated.View>
                 <View style={styles.essentialBtnContainerInLandscape}>
                     <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
@@ -387,15 +413,16 @@ class ToolBar extends Component {
     }
     renderElementLayer(mode) {
         let topMargin = ScreenWidth * 1960 / 1251;
+        let sMargin = -topMargin - Utils.getPhoneTopDistance();
         if (this.state.showItemsModal) {
             if (mode === "portrait") {
-                return (<View style={{ position: "absolute", top: -topMargin - Utils.getPhoneTopDistance(), width: ScreenWidth, height: Utils.getAvailableZone(), backgroundColor: "transparent", flex: 1 }}>
+                return (<Animated.View style={{ position: "absolute", top: sMargin, width: ScreenWidth, height: Utils.getAvailableZone(), backgroundColor: "transparent", flex: 1 }}>
                     {this.renderItemsContent()}
-                </View>)
+                </Animated.View>)
             } else {
-                return (<View style={{ position: "absolute", left: -topMargin - Utils.getPhoneTopDistance(), top: 0, width: Utils.getAvailableZone(), height: ScreenWidth, backgroundColor: "transparent", flex: 1 }}>
+                return (<Animated.View style={{ position: "absolute", left: sMargin, top: 0, width: Utils.getAvailableZone(), height: ScreenWidth, backgroundColor: "transparent", flex: 1 }}>
                     {this.renderItemsContent()}
-                </View>)
+                </Animated.View>)
             }
         } else {
             return null
