@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { TouchableOpacity, View, Image, TextInput, Dimensions, Platform, Animated, Keyboard } from "react-native";
 import * as Animatable from "react-native-animatable";
 import styles from "./TextEditAreaStyle";
+import ColorMappings from "../data/ColorMappings";
 
 const deviceHeight = Dimensions.get("window").height;
 const deviceWidth = Dimensions.get("window").width;
@@ -24,7 +25,8 @@ class TextEditArea extends Component {
         this.rootViewPaddingBottom = new Animated.Value(this.isIphonexPortrait ? 34 : 0);
         this.state = {
             textInputHeight: 20,
-            value: props.data.text
+            value: props.data.text,
+            selectedColorIndex: 4
         };
     }
 
@@ -59,7 +61,55 @@ class TextEditArea extends Component {
     onTextInputViewLayout(event) {
         this.textInputViewHeight = event.nativeEvent.layout.height;
     }
+    /**
+     * 渲染颜色选择列表
+     *
+     * @memberof ToolBar
+     */
+    renderColorSelectionList() {
+        let items = [];
+        ColorMappings.forEach((item, index) => {
+            items.push(this.renderColorSelectionItem(item, index));
+        });
+        return (
+            <View style={styles.colorList}>
+                {items}
+            </View>
+        );
 
+    }
+    /**
+     * 渲染颜色选择块
+     *
+     * @param {*} item
+     * @returns
+     * @memberof ToolBar
+     */
+    renderColorSelectionItem(item, index) {
+        return (
+            <TouchableOpacity onPress={() => this.onSelectColor(index)}>
+                <View style={[
+                    styles.colorItemContainerPortrait,
+                    { borderColor: index === this.state.selectedColorIndex ? "rgba(255,255,255,0.33)" : "rgba(0,0,0,0)" }
+                ]}>
+                    <View style={[
+                        styles.colorItemPortrait,
+                        { backgroundColor: item.uxColor }
+                    ]} />
+                </View>
+            </TouchableOpacity>
+        );
+    }
+    /**
+     * 选择颜色的响应函数
+     *
+     * @memberof ToolBar
+     */
+    onSelectColor(index) {
+        this.setState({
+            selectedColorIndex: index
+        });
+    }
     render() {
         return (
             <Animatable.View
@@ -75,7 +125,7 @@ class TextEditArea extends Component {
                     <TouchableOpacity onPress={this.props.onCancel}>
                         <Image source={require("../images/text/cancel_typing.png")} style={styles.operationImage} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => { this.props.onConfirm(this.state.value) }}>
+                    <TouchableOpacity onPress={() => { this.props.onConfirm(this.state.value, ColorMappings[this.state.selectedColorIndex].color) }}>
                         <Image source={require("../images/text/end_typing.png")} style={styles.operationImage} />
                     </TouchableOpacity>
                 </View>
@@ -91,14 +141,7 @@ class TextEditArea extends Component {
                         value={this.state.value}
                         onChangeText={(text) => { this.setState({ value: text }) }} />
                 </View>
-                <View style={styles.colorList}>
-                    <View style={styles.colorItem} />
-                    <View style={styles.colorItem} />
-                    <View style={styles.colorItem} />
-                    <View style={styles.colorItem} />
-                    <View style={styles.colorItem} />
-                    <View style={styles.colorItem} />
-                </View>
+                {this.renderColorSelectionList()}
             </Animatable.View>
         );
     }

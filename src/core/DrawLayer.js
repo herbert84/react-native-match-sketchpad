@@ -31,27 +31,34 @@ class DrawLayer extends SketchObject {
         console.log("grant");
     };
     _handlePanDrawResponderMove = (e, gestureState) => {
-        let originX = (gestureState.dx >= 0) ? e.nativeEvent.locationX - gestureState.dx : e.nativeEvent.locationX;
-        let originY = (gestureState.dy >= 0) ? e.nativeEvent.locationY - gestureState.dy : e.nativeEvent.locationY;
-        let targetX = (gestureState.dx >= 0) ? e.nativeEvent.locationX : e.nativeEvent.locationX - gestureState.dx;
-        let targetY = (gestureState.dy >= 0) ? e.nativeEvent.locationY : e.nativeEvent.locationY - gestureState.dy;
         if (this.props.data.shape === "SketchpadRectangle" || this.props.data.shape === "SketchpadEllipse") {
+            let originX = (gestureState.dx >= 0) ? e.nativeEvent.locationX - gestureState.dx : e.nativeEvent.locationX;
+            let originY = (gestureState.dy >= 0) ? e.nativeEvent.locationY - gestureState.dy : e.nativeEvent.locationY;
+            let targetX = (gestureState.dx >= 0) ? e.nativeEvent.locationX : e.nativeEvent.locationX - gestureState.dx;
+            let targetY = (gestureState.dy >= 0) ? e.nativeEvent.locationY : e.nativeEvent.locationY - gestureState.dy;
             let path = {
                 shape: this.props.data.shape,
                 type: this.props.data.type,
                 x: originX / this.scaleFactor,
                 y: originY / this.scaleFactor,
+                color: this.props.data.color,
+                backgroundColor: this.props.data.backgroundColor,
                 width: Math.abs(targetX - originX) / this.scaleFactor,
                 height: Math.abs(targetY - originY) / this.scaleFactor
             }
             this.props.attachAddPathEvent(path);
         } else if (this.props.data.shape === "SketchpadStraightLine") {
+            let originX = e.nativeEvent.locationX - gestureState.dx;
+            let originY = e.nativeEvent.locationY - gestureState.dy;
+            let targetX = e.nativeEvent.locationX;
+            let targetY = e.nativeEvent.locationY;
             let path = {
                 type: this.props.data.type,
                 startX: originX / this.scaleFactor,
                 startY: originY / this.scaleFactor,
                 endX: targetX / this.scaleFactor,
                 endY: targetY / this.scaleFactor,
+                color: this.props.data.color,
                 shape: this.props.data.shape
             }
             this.props.attachAddPathEvent(path);
@@ -83,16 +90,30 @@ class DrawLayer extends SketchObject {
             path.y = originY / this.scaleFactor;
             path.width = Math.abs(targetX - originX) / this.scaleFactor;
             path.height = Math.abs(targetY - originY) / this.scaleFactor;
+            path.color = this.props.data.color;
+            path.backgroundColor = this.props.data.backgroundColor;
             path.status = "done";
         } else if (shape === "SketchpadStraightLine") {
+            // 对于直线的拖动，直接计算其起点和终点的坐标即可
+            originX = e.nativeEvent.locationX - gestureState.dx;
+            originY = e.nativeEvent.locationY - gestureState.dy;
+            targetX = e.nativeEvent.locationX;
+            targetY = e.nativeEvent.locationY;
             path.startX = originX / this.scaleFactor;
             path.startY = originY / this.scaleFactor;
             path.endX = targetX / this.scaleFactor;
             path.endY = targetY / this.scaleFactor;
+            path.color = this.props.data.color;
+            path.style = this.props.data.data.style || [];
+            path.lineWidth = this.props.data.data.lineWidth || 1;
+            path.startArrow = this.props.data.data.startArrow || false;
+            path.endArrow = this.props.data.data.endArrow || false;
+            path.arrowLength = 15;
             path.status = "done";
         } else if (shape === "SketchpadCurvedLine") {
             path.x = e.nativeEvent.locationX / this.scaleFactor;
             path.y = e.nativeEvent.locationY / this.scaleFactor;
+            path.color = this.props.data.color;
         }
         this.props.attachAddPathEvent(path);
     }

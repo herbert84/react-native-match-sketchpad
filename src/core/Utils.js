@@ -121,6 +121,60 @@ const Utils = {
         }
         return 0;
     },
+    /**
+     *
+     * @description 在打开战术板时部分图形按照一定放大比例放大。保存数据时按照一定比例缩小
+     * @param {*} item
+     * @param {*} scaleType 当前需要放大尺寸还是缩小尺寸
+     * @returns
+     */
+    dataScale(item, scaleType) {
+        let classNameArray = item.className.split(".");
+        let type = classNameArray[classNameArray.length - 1];
+        let scale = this.getScaleNum(type, item.image);
+        return (scaleType === "reduce") ? item.scale / scale : item.scale * scale;
+    },
+    getScaleNum(shape, type) {
+        let regPlayer = /^(red|blue|yelloe|green)[1-6].png$/;
+        switch (shape) {
+            case "SketchpadText": scale = Math.pow(1.1, 5); break;
+            case "SketchpadShape":
+                if (type.indexOf("football.png") > -1 || type.indexOf("medicine_ball.png") > -1) {
+                    scale = Math.pow(1.1, 15);
+                } else if (type.indexOf("coordination_ladder") > -1 || type.indexOf("goal") > -1 || type.indexOf("gymnastics_box") > -1) {
+                    scale = 1;
+                } else if (regPlayer.test(type)) {
+                    scale = Math.pow(1.1, 5);
+                } else {
+                    scale = Math.pow(1.1, 10);
+                }
+                break;
+            default: scale = 1; break;
+        }
+        return scale;
+    },
+    getDefaultScaleValue(shape, type) {
+        let regPlayer = /^(red|blue|yellow|green)[1-6].png$/;
+        let defaultValue = 1;
+        if (shape === "SketchpadShape") {
+            if (type.indexOf("medicine_ball") > -1 || type.indexOf("football") > -1) {
+                defaultValue = 0.08;
+            } else if (type.indexOf("goal1.png") > -1 || type.indexOf("goal3.png") > -1) {
+                defaultValue = 0.4;
+            } else if (type.indexOf("goal2.png") > -1) {
+                defaultValue = 0.7;
+            } else if (type.indexOf("flag.png") > -1 || type.indexOf("pole") > -1 || type.indexOf("gymnastics_box") > -1) {
+                defaultValue = 0.2;
+            } else if (type.indexOf("coordination_ladder2.png") > -1 || type.indexOf("opponent") > -1) {
+                defaultValue = 0.25;
+            } else if (regPlayer.test(type)) {
+                defaultValue = 0.3;
+            } else {
+                defaultValue = 0.15;
+            }
+        }
+        return defaultValue;
+    },
     recalculateItems(items, offsetX) {
         let newItems = [];
         for (var i in items) {
@@ -131,6 +185,7 @@ const Utils = {
                     newItem.points[i] = newItem.points[i] - offsetX;
                 }
             }
+            newItem.scale = this.dataScale(newItem, "enlarge");
             if (newItem.x) {
                 newItem.x = newItem.x - offsetX;
             }

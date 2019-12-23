@@ -94,6 +94,9 @@ class Container extends Component {
                 itemSelected: object.selectedId ? true : false,
                 selectedObjectShape: object.selectedId ? object.shape : null
             });
+            if (object.eventType === "MOVE") {
+                this.history.addOperationData(JSON.parse(JSON.stringify(this.state.items)), "move");
+            }
         }
     }
     needToListenerAddPathEvent(object) {
@@ -141,7 +144,7 @@ class Container extends Component {
             items: newItems
         }, () => {
             if (object.status === "done") {
-                this.continueDraw({ shape: object.shape, type: object.type ? object.type : null });
+                this.continueDraw(object);
             }
         })
     }
@@ -162,6 +165,7 @@ class Container extends Component {
             isPortrait: this.needRotate ? false : true,
             statusBarStyle: this.state.isFull ? "dark-content" : "light-content"
         });
+        this.finalizeDrawing(true);
     }
     /**
      * 根据模式设置屏幕为横竖屏
@@ -231,7 +235,7 @@ class Container extends Component {
         }
     }
     continueDraw(item) {
-        let items = this.state.items;
+        let items = JSON.parse(JSON.stringify(this.state.items));
         let that = this;
         let newItems = [];
         for (var i in items) {
@@ -259,9 +263,7 @@ class Container extends Component {
         });
     }
     startDrawMode(item) {
-        // 点击创建物件时，取消选择当前画布所有物体
-        //DeviceEventEmitter.emit("sketchobject_" + this.instanceId, JSON.stringify({ selectedId: null }))
-        let newItems = this.state.items;
+        let newItems = JSON.parse(JSON.stringify(this.state.items));
         let scale = this.props.width === "100%" ? 400 / 1960 : this.props.width / 1960;
         let width = (this.needRotate) ? (1960 / 1251 * ScreenWidth / scale).toString() : ScreenWidth / scale.toString();
         let height = (this.needRotate) ? ScreenWidth / scale.toString() : (1960 / 1251 * ScreenWidth / scale).toString();
@@ -276,8 +278,14 @@ class Container extends Component {
             this.currentSketchpadTextItem = newItem;
         } else {
             let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
-            newItems.push(newItem);
-            newItems.push(drawLayerItem);
+            //检测如果当前是否在连续绘制图形模式下，如果发现当前有图形在绘制则替换绘制层，否则在当前堆栈中添加绘制层
+            if (newItems.length > 0 && newItems[newItems.length - 1].status === "new") {
+                newItems[newItems.length - 2] = newItem;
+                newItems[newItems.length - 1] = drawLayerItem
+            } else {
+                newItems.push(newItem);
+                newItems.push(drawLayerItem);
+            }
             this.setState({
                 itemSelected: null,
                 items: newItems,
@@ -376,9 +384,10 @@ class Container extends Component {
      *
      * @memberof Container
      */
-    onConfirmTextEditing(newText) {
+    onConfirmTextEditing(newText, color) {
         if (this.currentSketchpadTextItem) {
             this.currentSketchpadTextItem.text = newText;
+            this.currentSketchpadTextItem.color = color;
             let newItems = this.state.items;
             // 如果是新建的文本，则添加到item里面
             if (this.currentSketchpadTextItem.status === "drawing") {
@@ -400,12 +409,12 @@ class Container extends Component {
      * @param {*} layout
      * @memberof Container
      */
-    onTextItemLayout(item, layout) {
+    onTextItemLayout(item, size) {
         // 判断是否为新添加的文本
         if (item.status === "drawing") {
             this.state.items.forEach(element => {
                 if (element.id === item.id) {
-                    element.x = Math.max(0, (1960 - this.offsetX * 2 - layout.width) / 2);
+                    element.x = Math.max(0, (1960 - this.offsetX * 2 - size.width) / 2);
                     element.status = "done";
                 }
             });

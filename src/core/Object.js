@@ -144,8 +144,8 @@ class SketchObject extends Component {
             this.props.data.x = this.state.x / this.scaleFactor;
             this.props.data.y = this.state.y / this.scaleFactor;
         }
-        this.props.attachObjectEvent({ selectedId: this.props.data.id, shape, item: this.props.data });
-        //DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: this.props.data.id, shape, item: this.props.data }))
+        let type = gestureState.dx === 0 ? "CLICK" : "MOVE";
+        this.props.attachObjectEvent({ selectedId: this.props.data.id, shape, item: this.props.data, eventType: type });
     }
     getRectSize() {
         let { points } = this.props.data;
@@ -192,8 +192,7 @@ class SketchObject extends Component {
      */
     objectOnPress() {
         let shape = Utils.getItemType(this.props.data);
-        this.props.attachObjectEvent({ selectedId: this.props.data.id, shape });
-        //DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: this.props.data.id, shape }))
+        this.props.attachObjectEvent({ selectedId: this.props.data.id, shape, eventType: "CLICK" });
     }
     /**
      * @description 双击物件后的响应函数

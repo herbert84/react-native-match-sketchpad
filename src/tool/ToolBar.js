@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { View, FlatList, Text, ScrollView, Dimensions, Image } from "react-native";
+import { View, FlatList, Text, ScrollView, Dimensions, Image, Animated, TouchableOpacity } from "react-native";
 import * as _ from "lodash";
 import Utils from "../core/Utils";
 import Button from "../component/Button";
 import AppImageList from "../core/AppImageList";
 import ToolElementItems from "../data/ToolElement";
 import ToolElementSelectedItems from "../data/ToolElementSelected";
+import ColorMappings from "../data/ColorMappings";
 import Remove from "./Remove";
 import Undo from "./Undo";
 import RotationTool from "./RotationTool";
@@ -32,10 +33,12 @@ class ToolBar extends Component {
             showItemsModalShape: "", //元素蒙层形状
             showItemsModalIcon: "", //元素蒙层图标
             activeItem: null, //当前被激活的元素,
+            selectedColorIndex: 4,  //选中的颜色的索引位置，默认选中黑色
             itemSelectedIsTop: false,
             itemSelectedIsBottom: false,
             itemSelectedId: null,
-            itemSelected: false
+            itemSelected: false,
+            securetyTipViewY: new Animated.Value(ScreenHeight)
         }
     }
     componentWillReceiveProps(newProps) {
@@ -43,6 +46,27 @@ class ToolBar extends Component {
             itemSelectedId: newProps.itemSelectedId,
             itemSelected: newProps.itemSelected
         })
+    }
+    //展示View
+    _showTipView = () => {
+        let topMargin = ScreenWidth * 1960 / 1251;
+        Animated.timing(
+            this.state.securetyTipViewY,
+            {
+                toValue: -topMargin - Utils.getPhoneTopDistance(),
+                duration: 1000,   //动画时长300毫秒
+            }
+        ).start();
+    }
+
+    //隐藏view
+    _hiddenTipView = () => {
+        Animated.timing(
+            this.state.securetyTipViewY,
+            {
+                toValue: ScreenHeight,
+                duration: 1000,   //动画时长300毫秒
+            }).start();
     }
     _keyExtractor = (item, index) => Utils.randomStringId(10);
     onPressElementItem(item) {
@@ -56,11 +80,14 @@ class ToolBar extends Component {
                     showItemsModalIcon: item.image,
                     activeItem: item,
                     showShapeItems: item.nodes
-                })
+                });
             } else {
                 this.setState({
                     showItemsModal: false
-                })
+                });
+
+                item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
+                item.backgroundColor = ColorMappings[this.state.selectedColorIndex].backgroundColor;  //设置选中的颜色
                 this.props.startDrawMode(item)
             }
         } else {
@@ -69,11 +96,13 @@ class ToolBar extends Component {
                     expandElementItems: false,
                     showElementItems: ToolElementItems
                 })
+                this._hiddenTipView()
             } else {
                 this.setState({
                     expandElementItems: true,
                     showElementItems: ToolElementItems[0].nodes
-                })
+                });
+                this._showTipView()
             }
         }
     }
@@ -145,7 +174,7 @@ class ToolBar extends Component {
         let paddingLeftRight = this.props.isPortrait ? 16 : 24;
         return (<View style={{ flexDirection: "row", paddingTop: 16, paddingBottom: 16, paddingLeft: paddingLeftRight, paddingRight: paddingLeftRight, "justifyContent": "space-between" }}>
             <Text style={styles.modalLabel}>{this.state.showItemsModalLabel}</Text>
-            <Text style={styles.modalLabel} onPress={() => this.setState({ showItemsModal: false })}>{Utils.getTranslatedText("BUTTON", "CANCEL", this.props.language)}</Text>
+            <Text style={styles.modalLabel} onPress={() => { this.setState({ showItemsModal: false }); this._hiddenTipView(); }}>{Utils.getTranslatedText("BUTTON", "CANCEL", this.props.language)}</Text>
         </View>)
     }
     /**
@@ -161,6 +190,7 @@ class ToolBar extends Component {
             let numColumns = (this.state.showItemsModalShape === "LINE") ? Math.ceil(this.state.showShapeItems.length / 4) : this.state.showItemsModalShape === "AREAS" ? 3 : Math.ceil(this.state.showShapeItems.length / 2);
             return (<View style={{ position: "absolute", bottom: 0, height: contentHeight, width: "100%", backgroundColor: "#000" }}>
                 {this.renderShapeSelectModalToolBar()}
+                {this.renderColorSelectionList()}
                 <ScrollView style={{ flexDirection: "row", paddingLeft: 16, paddingRight: 8 }} horizontal={true}>
                     <FlatList
                         data={this.state.showShapeItems}
@@ -174,9 +204,62 @@ class ToolBar extends Component {
         } else {
             return (<View style={{ position: "absolute", right: 0, width: 229, height: ScreenWidth, backgroundColor: "#000" }}>
                 {this.renderShapeSelectModalToolBar()}
+                {this.renderColorSelectionList()}
                 {this.renderListContainer()}
             </View >)
         }
+    }
+    /**
+     * 渲染颜色选择列表
+     *
+     * @memberof ToolBar
+     */
+    renderColorSelectionList() {
+        if (this.state.showItemsModalShape === "LINE" || this.state.showItemsModalShape === "AREAS") {
+            let items = [];
+            ColorMappings.forEach((item, index) => {
+                items.push(this.renderColorSelectionItem(item, index));
+            });
+            return (
+                <View style={styles.colorList}>
+                    {items}
+                </View>
+            );
+        } else {
+            return null;
+        }
+    }
+    /**
+     * 渲染颜色选择块
+     *
+     * @param {*} item
+     * @returns
+     * @memberof ToolBar
+     */
+    renderColorSelectionItem(item, index) {
+        return (
+            <TouchableOpacity onPress={() => this.onSelectColor(index)}>
+                <View style={[
+                    this.props.isPortrait ? styles.colorItemContainerPortrait : styles.colorItemContainer,
+                    { borderColor: index === this.state.selectedColorIndex ? "rgba(255,255,255,0.33)" : "rgba(0,0,0,0)" }
+                ]}>
+                    <View style={[
+                        this.props.isPortrait ? styles.colorItemPortrait : styles.colorItem,
+                        { backgroundColor: item.uxColor }
+                    ]} />
+                </View>
+            </TouchableOpacity>
+        );
+    }
+    /**
+     * 选择颜色的响应函数
+     *
+     * @memberof ToolBar
+     */
+    onSelectColor(index) {
+        this.setState({
+            selectedColorIndex: index
+        });
     }
     /**
      *

@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import { Platform } from "react-native";
 import PropTypes from 'prop-types';
 import SketchObject from "../core/Object";
 import Svg, { Text, Rect, G } from 'react-native-svg';
 import * as _ from "lodash";
+import TextSize, { TSFontSpecs } from 'react-native-text-size';
 
 class SketchText extends SketchObject {
     static propTypes = {
@@ -33,7 +35,7 @@ class SketchText extends SketchObject {
         }, 200);
         this.state = {
             pressTextCount: 0,
-            isTextRendered: false,
+            isTextMeasured: false,
             touchAreaX: 0,
             touchAreaY: 0,
             touchAreaWidth: 0,
@@ -41,32 +43,38 @@ class SketchText extends SketchObject {
         };
     }
     getSizeByHeight() {
-        return 40 * this.scaleFactor * this.props.data.scale;
+        return 20 * this.scaleFactor * this.props.data.scale;
     }
+    /**
+     * 点击文本的响应函数，第一阶段先不处理双击事件
+     *
+     * @memberof SketchText
+     */
     onPressText() {
-        let currentPressCount = this.state.pressTextCount ? this.state.pressTextCount : 0;
-        this.setState({
-            pressTextCount: currentPressCount + 1
-        });
-        this.firePressEvent();
+        // let currentPressCount = this.state.pressTextCount ? this.state.pressTextCount : 0;
+        // this.setState({
+        //     pressTextCount: currentPressCount + 1
+        // });
+        // this.firePressEvent();
+        this.objectOnPress();
     }
-    onTextLayout(event) {
-        console.log(event.nativeEvent.layout);
-        console.log(this.props.data.text);
-        let { layout } = event.nativeEvent;
-        let { x, y, width, height } = event.nativeEvent.layout;
-        if (!(x === 0 && y === 0 && height === 0)) {
-            if (this.props.data.status === "drawing") {
-                this.props.onTextLayout && this.props.onTextLayout(layout);
-            } else {
-                this.setState({
-                    isTextRendered: true,
-                    touchAreaHeight: height,
-                    touchAreaWidth: width,
-                    touchAreaX: x,
-                    touchAreaY: y
-                });
-            }
+    async measureTextSize(data) {
+        let size = await TextSize.measure({
+            text: data.text,
+            fontFamily: data.font,
+            fontSize: this.getSizeByHeight(data.scale)
+        });
+        // this.textSize = size;
+        if (this.props.data.status === "drawing") {
+            console.log(this.props.data.text);
+            console.log(size);
+            this.props.onTextLayout && this.props.onTextLayout(size);
+        } else {
+            this.setState({
+                isTextMeasured: true,
+                touchAreaHeight: size.height,
+                touchAreaWidth: size.width
+            });
         }
     }
     renderTextInContainer() {
@@ -77,32 +85,21 @@ class SketchText extends SketchObject {
                 fontFamily={this.props.data.font}
                 fontSize={this.getSizeByHeight()}
                 textAnchor="start"
+                fill={this.props.data.color}
                 opacity={this.props.data.status === "drawing" ? "0" : "1"}
                 onPress={this.onPressText.bind(this)}>
                 {this.props.data.text}
             </Text>
         );
     }
-    renderText() {
-        return (
-            <Text
-                x={this.props.data.x * this.scaleFactor}
-                y={this.props.data.y * this.scaleFactor}
-                fontFamily={this.props.data.font}
-                fontSize={this.getSizeByHeight()}
-                textAnchor="start"
-                opacity={this.props.data.status === "drawing" ? "0" : "1"}
-                onPress={this.onPressText.bind(this)}
-                onLayout={this.onTextLayout.bind(this)}>
-                {this.props.data.text}
-            </Text>
-        );
-    }
     renderTouchArea() {
-        if (this.state.isTextRendered && this.isEdit && this.props.data.status !== "drawing") {
+        // workaround: 安卓平台下面，画svg的时候如果一个物体的不透明度为0的话，该物体将不能触发点击事件
+        // 因此需要判断当运行平台为安卓时，文本选择框的最小不透明度为0.02
+        const MIN_OPACITY = Platform.OS === "ios" ? "0" : "0.02";
+        if (this.state.isTextMeasured && this.isEdit && this.props.data.status !== "drawing") {
             return (
                 <Rect x="0"
-                    y={0 - this.state.touchAreaHeight}
+                    y={0 - this.state.touchAreaHeight + (this.state.touchAreaHeight / 5)} // 修正在Group下的位置偏移
                     width={this.state.touchAreaWidth}
                     height={this.state.touchAreaHeight}
                     fill="rgb(0, 0, 0)"
@@ -110,7 +107,7 @@ class SketchText extends SketchObject {
                     strokeLinejoin="round"
                     strokeWidth="0"
                     stroke={this.props.data.color}
-                    opacity={this.state.isSelected ? "0.15" : "0"}
+                    opacity={this.state.isSelected ? "0.15" : MIN_OPACITY}
                     onPress={this.onPressText.bind(this)}
                 />
             );
@@ -142,13 +139,12 @@ class SketchText extends SketchObject {
     }
     render() {
         let result = [];
-        if (this.props.data.status === "drawing" || !this.state.isTextRendered) {
-            result.push(this.renderText());
+        if (this.props.data.status === "drawing" || !this.state.isTextMeasured) {
+            this.measureTextSize(this.props.data);
             return result;
         } else {
             result.push(this.renderTouchArea());
             result.push(this.renderTextInContainer());
-
             return this.textContainer(result);
         }
     }

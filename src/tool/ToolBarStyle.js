@@ -32,6 +32,45 @@ const styles = StyleSheet.create({
     modalLabel: {
         color: "#FFF",
         fontSize: 15
+    },
+    colorList: {
+        backgroundColor: "rgba(0, 0, 0, .6)",
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center",
+        height: 34,
+        marginBottom: 16,
+        width: "100%"
+    },
+    colorItemContainer: {
+        height: 26,
+        width: 26,
+        marginLeft: 2,
+        marginRight: 2,
+        borderRadius: 13,
+        borderWidth: 5
+    },
+    colorItem: {
+        height: 16,
+        width: 16,
+        borderRadius: 8,
+        borderWidth: 3,
+        borderColor: "#FFFFFF"
+    },
+    colorItemContainerPortrait: {
+        height: 32,
+        width: 32,
+        marginLeft: 8,
+        marginRight: 8,
+        borderRadius: 16,
+        borderWidth: 5
+    },
+    colorItemPortrait: {
+        height: 22,
+        width: 22,
+        borderRadius: 11,
+        borderWidth: 3,
+        borderColor: "#FFFFFF"
     }
 });
 

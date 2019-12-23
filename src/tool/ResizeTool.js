@@ -8,7 +8,7 @@ class ResizeTool extends Component {
         let newItems = [];
         for (var i in items) {
             if (items[i].id === itemSelectedId) {
-                items[i].scale = (this.props.type === "enlarge") ? items[i].scale * 1.5 : items[i].scale / 1.5;
+                items[i].scale = (this.props.type === "enlarge") ? items[i].scale * 1.1 : items[i].scale / 1.1;
             }
             newItems.push(items[i])
         }

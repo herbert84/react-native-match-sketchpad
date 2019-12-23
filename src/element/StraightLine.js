@@ -2,12 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import * as _ from "lodash";
 import Line from "./Line";
-import {
-    Svg,
-    Image,
-    Path,
-    G
-} from 'react-native-svg';
+import { Path } from 'react-native-svg';
 
 class StraightLine extends Line {
     static propTypes = {
@@ -18,7 +13,7 @@ class StraightLine extends Line {
 
     static defaultProps = {
         touchAreaBackgroundColor: "transparent",
-        selectedLineColor: "red",
+        selectedLineColor: "rgba(0,0,0,0.15)",
         type: "StraightLine"
     };
     constructor(props) {
@@ -73,13 +68,13 @@ class StraightLine extends Line {
             y1 = x * Math.sin(phi) + y * Math.cos(phi) + ys;
             pathData += `L${x1} ${y1} `;  // line to x1, y1
         }
-        let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
-        let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
-
+        //let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
+        //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
+        let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
         if (isTouchArea) {
-            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 10} fill="none" onPress={() => this.objectOnPress()} />;
+            return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
         } else {
-            return <Path d={pathData} stroke={color} strokeDasharray={this.strokeDasharray} strokeWidth={width} fill="none" />;
+            return <Path d={pathData} stroke={this.props.data.color} strokeDasharray={this.strokeDasharray} strokeWidth={this.props.data.lineWidth} fill="none" />;
         }
     }
     /**
@@ -97,13 +92,13 @@ class StraightLine extends Line {
         // draw the line
         pathData += `M${xs} ${ys} `;
         pathData += `L${xe} ${ye} `;
-        let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
-        let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
-
+        //let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
+        //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
+        let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
         if (isTouchArea) {
-            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 10} fill="none" onPress={() => this.objectOnPress()} />;
+            return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
         } else {
-            return <Path d={pathData} stroke={color} strokeDasharray={this.strokeDasharray} strokeWidth={width} fill="none" />;
+            return <Path d={pathData} stroke={this.props.data.color} strokeDasharray={this.strokeDasharray} strokeWidth={this.props.data.lineWidth} fill="none" />;
         }
     }
     /**
@@ -137,12 +132,13 @@ class StraightLine extends Line {
         pathData += `M${xs2 * this.scaleFactor} ${ys2 * this.scaleFactor} `;
         pathData += `L${xe2 * this.scaleFactor} ${ye2 * this.scaleFactor} `;
 
-        let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
-        let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
+        //let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
+        let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
+        //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
         if (isTouchArea) {
-            return <Path d={pathData} stroke={this.props.touchAreaBackgroundColor} strokeWidth={this.props.data.lineWidth * 10} fill="none" onPress={() => this.objectOnPress()} />;
+            return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
         } else {
-            return <Path d={pathData} stroke={color} strokeDasharray={this.strokeDasharray} strokeWidth={width} fill="none" />;
+            return <Path d={pathData} stroke={this.props.data.color} strokeDasharray={this.strokeDasharray} strokeWidth={this.props.data.lineWidth} fill="none" />;
         }
     }
     render() {
@@ -158,9 +154,9 @@ class StraightLine extends Line {
         result.push(...this.drawArrows(this.minXPoint.x, this.minYPoint.y));
         // draw line
         switch (this.props.data.type) {
-            case "sinus": result.push(this.drawSinusLine(x1, y1, x2, y2)); result.push(this.drawSinusLine(x1, y1, x2, y2, true)); break;
-            case "double": result.push(this.drawDoubleLine(x1, y1, x2, y2)); result.push(this.drawDoubleLine(x1, y1, x2, y2, true)); break;
-            default: result.push(this.drawSimpleLine(x1, y1, x2, y2)); result.push(this.drawSimpleLine(x1, y1, x2, y2, true)); break;
+            case "sinus": result.push(this.drawSinusLine(x1, y1, x2, y2, true)); result.push(this.drawSinusLine(x1, y1, x2, y2)); break;
+            case "double": result.push(this.drawDoubleLine(x1, y1, x2, y2, true)); result.push(this.drawDoubleLine(x1, y1, x2, y2)); break;
+            default: result.push(this.drawSimpleLine(x1, y1, x2, y2, true)); result.push(this.drawSimpleLine(x1, y1, x2, y2)); break;
         }
         return this.lineContainer(result);
     }

@@ -3,8 +3,6 @@ import { View, Text } from "react-native";
 import PropTypes from 'prop-types';
 import SketchObject from "../core/Object";
 import {
-    Svg,
-    Image,
     Path,
     G
 } from 'react-native-svg';
@@ -24,6 +22,19 @@ class Line extends SketchObject {
         // 初始化虚线样式
         if (props.data.style && props.data.style.length === 1) {
             this.strokeDasharray = [props.data.style[0], props.data.style[0]];
+        }
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.selectedId === this.props.data.id) {
+            console.log("found and selected")
+            this.setState({
+                isSelected: true
+            })
+            this.addDraggableResponder()
+        } else {
+            this.setState({
+                isSelected: false
+            })
         }
     }
     /**
@@ -60,12 +71,12 @@ class Line extends SketchObject {
         pathData += `L${toX - headlen * Math.cos(angle - arrowAngle)} ${toY - headlen * Math.sin(angle - arrowAngle)} `;
         pathData += `M${toX} ${toY} `;
         pathData += `L${toX - headlen * Math.cos(angle + arrowAngle)} ${toY - headlen * Math.sin(angle + arrowAngle)} `;
-        let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
-        let color = this.state.isSelected ? "red" : this.props.data.color
+        //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
+        //let color = this.state.isSelected ? "red" : this.props.data.color
         return <Path d={pathData}
-            stroke={color}
+            stroke={this.props.data.color}
             strokeDasharray={this.strokeDasharray}
-            strokeWidth={width}
+            strokeWidth={this.props.data.lineWidth}
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"

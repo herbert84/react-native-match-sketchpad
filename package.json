@@ -1,12 +1,13 @@
 {
     "name": "react-native-match-sketchpad",
-    "version": "0.12.18",
+    "version": "0.12.22",
     "main": "index.js",
     "dependencies": {
-        "react-native-svg": "^9.13.3",
+        "lodash": "^4.17.15",
         "react-native-modal": "^11.0.2",
         "react-native-orientation": "^3.1.3",
-        "lodash": "^4.17.15"
+        "react-native-svg": "^9.13.3",
+        "react-native-text-size": "^4.0.0-rc.1"
     },
     "keywords": [
         "react-native",

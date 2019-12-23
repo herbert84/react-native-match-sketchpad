@@ -535,5 +535,5 @@ const ToolElementItems = [{
                 }
             ]
         }]
-}]
+}];
 export default ToolElementItems;

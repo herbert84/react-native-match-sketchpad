@@ -16,7 +16,7 @@ class CurvedLine extends Line {
 
     static defaultProps = {
         touchAreaBackgroundColor: "transparent",
-        selectedLineColor: "red"
+        selectedLineColor: "rgba(0,0,0,0.15)"
     };
     constructor(props) {
         super(props);
@@ -53,12 +53,13 @@ class CurvedLine extends Line {
         for (let i = 0, l = res.length; i < l; i += 2) {
             pathData += `L${res[i] * this.scaleFactor - this.minXPoint.x} ${res[i + 1] * this.scaleFactor - this.minYPoint.y} `;
         }
-        let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
-        let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
+        //let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
+        //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
+        let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
         if (isTouchArea) {
             return <Path d={pathData}
-                stroke={this.props.touchAreaBackgroundColor}
-                strokeWidth={this.props.data.lineWidth * 20}
+                stroke={touchAreaColor}
+                strokeWidth={this.props.data.lineWidth * 5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 fill="none"
@@ -66,9 +67,9 @@ class CurvedLine extends Line {
             />;
         } else {
             return <Path d={pathData}
-                stroke={color}
+                stroke={this.props.data.color}
                 strokeDasharray={this.strokeDasharray}
-                strokeWidth={width}
+                strokeWidth={this.props.data.lineWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 fill="none"

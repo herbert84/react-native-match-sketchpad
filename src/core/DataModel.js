@@ -19,7 +19,7 @@ class DataModel {
                 id: "__shape-" + Utils.randomStringId(9),
                 showSelection: true,
                 rotation: 0,
-                scale: 1,
+                scale: Utils.getDefaultScaleValue(item.shape, item.type) * Utils.getScaleNum(item.shape, item.type),
                 mirror: false,
                 visible: true,
                 x: 0,
@@ -38,8 +38,8 @@ class DataModel {
                 style: [],
                 visible: true,
                 z: 0,
-                color: "rgb(0, 0, 0)",
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
+                color: item.color,
+                backgroundColor: item.backgroundColor,
                 points: []
             }
         } else if (shape === "SketchpadRectangle") {
@@ -57,8 +57,8 @@ class DataModel {
                 x: 0,
                 y: 0,
                 z: 0,
-                color: "rgb(0, 0, 0)",
-                backgroundColor: "rgba(0, 0, 0, 0.6)"
+                color: item.color,
+                backgroundColor: item.backgroundColor,
             }
         } else if (shape === "SketchpadStraightLine") {
             newObject = {
@@ -72,7 +72,7 @@ class DataModel {
                 visible: true,
                 points: [0, 0, 0, 0],
                 z: 0,
-                color: "rgb(0, 109, 169)",
+                color: item.color,
                 startArrow: item.startArrow || false,
                 endArrow: item.endArrow || false,
                 arrowLength: 15
@@ -89,7 +89,7 @@ class DataModel {
                 visible: true,
                 points: [],
                 z: 0,
-                color: "rgb(0, 0, 0)",
+                color: item.color,
                 startArrow: item.startArrow || false,
                 endArrow: item.endArrow || false,
                 arrowLength: 15
@@ -101,8 +101,8 @@ class DataModel {
                 className: "sap.sports.ui.controls.sketchpad.SketchpadEllipse",
                 status: "drawing",
                 id: "__ellipse-" + Utils.randomStringId(9),
-                backgroundColor: "rgba(0, 0, 0, 0.6)",
-                color: "rgb(0, 0, 0)",
+                backgroundColor: item.backgroundColor,
+                color: item.color,
                 lineWidth: 1,
                 height: 0,
                 width: 0,
@@ -119,7 +119,7 @@ class DataModel {
                 className: "sap.sports.ui.controls.sketchpad.SketchpadText",
                 status: "drawing",
                 id: "__text-" + Utils.randomStringId(9),
-                color: "rgb(0, 0, 0)",
+                color: item.color,
                 text: "",
                 height: 12,
                 x: 0,
@@ -128,7 +128,7 @@ class DataModel {
                 textStyle: "",
                 showSelection: true,
                 showIcons: false,
-                scale: 1,
+                scale: Utils.getDefaultScaleValue(item.shape, item.type) * Utils.getScaleNum(item.shape, item.type),
                 textAlign: "Begin",
                 verticalAlign: "Bottom",
                 font: "Arial",
@@ -149,8 +149,8 @@ class DataModel {
             style: [],
             visible: true,
             z: 0,
-            color: "rgb(0, 0, 0)",
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            color: item.color || "rgb(0, 0, 0)",
+            backgroundColor: item.backgroundColor || "rgba(0, 0, 0, 0.6)",
             points: [0, 0, canvasWidth, 0, canvasWidth, canvasHeight, 0, canvasHeight]
         }
     }
