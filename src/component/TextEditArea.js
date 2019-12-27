@@ -31,13 +31,21 @@ class TextEditArea extends Component {
     }
 
     componentWillMount() {
-        this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
-        this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
+        // android环境下不能触发 keyboardWillShow 和 keyboardWillHide 事件，只能使用 didShow 来代替
+        if (platform === "ios") {
+            this.keyboardWillShowSub = Keyboard.addListener('keyboardWillShow', this.keyboardWillShow);
+            this.keyboardWillHideSub = Keyboard.addListener('keyboardWillHide', this.keyboardWillHide);
+        } else {
+            this.keyboardDidShowSub = Keyboard.addListener('keyboardDidShow', this.keyboardDidShow);
+            this.keyboardDidHideSub = Keyboard.addListener('keyboardDidHide', this.keyboardDidHide);
+        }
     }
 
     componentWillUnmount() {
-        this.keyboardWillShowSub.remove();
-        this.keyboardWillHideSub.remove();
+        this.keyboardWillShowSub && this.keyboardWillShowSub.remove();
+        this.keyboardWillHideSub && this.keyboardWillHideSub.remove();
+        this.keyboardDidShowSub && this.keyboardDidShowSub.remove();
+        this.keyboardDidHideSub && this.keyboardDidHideSub.remove();
     }
 
     keyboardWillShow = (event) => {
@@ -53,6 +61,24 @@ class TextEditArea extends Component {
         Animated.parallel([
             Animated.timing(this.rootViewPaddingBottom, {
                 duration: event.duration,
+                toValue: this.isIphonexPortrait ? 34 : 0,
+            }),
+        ]).start();
+    };
+
+    keyboardDidShow = (event) => {
+        Animated.parallel([
+            Animated.timing(this.rootViewPaddingBottom, {
+                duration: 250,
+                toValue: event.endCoordinates.height,
+            }),
+        ]).start();
+    };
+
+    keyboardDidHide = () => {
+        Animated.parallel([
+            Animated.timing(this.rootViewPaddingBottom, {
+                duration: 250,
                 toValue: this.isIphonexPortrait ? 34 : 0,
             }),
         ]).start();
@@ -130,19 +156,23 @@ class TextEditArea extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.textInputView} onLayout={this.onTextInputViewLayout.bind(this)}>
-                    <TextInput
-                        style={[styles.textInput, { height: this.state.textInputHeight }]}
-                        multiline={true}
-                        autoFocus={true}
-                        textAlign={"center"}
-                        onContentSizeChange={(event) => {
-                            this.setState({ textInputHeight: Math.min(event.nativeEvent.contentSize.height, this.textInputViewHeight) });
-                        }}
-                        value={this.state.value}
-                        onChangeText={(text) => { this.setState({ value: text }) }} />
+                    <TouchableOpacity style={styles.textInputTouchArea} onPress={() => { this.textInputRef.focus() }}>
+                        <TextInput
+                            ref={(e) => { this.textInputRef = e }}
+                            style={[styles.textInput, { height: this.state.textInputHeight }]}
+                            multiline={true}
+                            autoFocus={true}
+                            textAlign={"center"}
+                            onContentSizeChange={(event) => {
+                                this.setState({ textInputHeight: Math.min(event.nativeEvent.contentSize.height, this.textInputViewHeight) });
+                            }}
+                            value={this.state.value}
+                            onChangeText={(text) => { this.setState({ value: text }) }}
+                            disableFullscreenUI={true} />
+                    </TouchableOpacity>
                 </View>
                 {this.renderColorSelectionList()}
-            </Animatable.View>
+            </Animatable.View >
         );
     }
 }

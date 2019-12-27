@@ -36,7 +36,7 @@ class Container extends Component {
         super(props);
         this.dataModel = JSON.parse(this.props.data);
         this.offsetX = Utils.getOffsetX(this.dataModel.background[0].image);
-        let convertedItems = Utils.recalculateItems(this.dataModel.items, this.offsetX);
+        let convertedItems = Utils.recalculateItems(this.dataModel.items, this.offsetX, "enlarge");
         //let convertedItems = this.dataModel.items;
         //Global.instanceId = Utils.randomStringId(10);
         //this.instanceId = Global.instanceId;
@@ -55,17 +55,34 @@ class Container extends Component {
             isPortrait: true,
             itemSelectedId: null,
             hasHistoryOperation: false,
-            isEditingText: false  //标识当前是不是在编辑文字
+            isEditingText: false  //标识当前是不是在编辑文字,
         }
         this.needRotate = true
     }
     componentDidMount() {
+        //Orientation.addOrientationListener(this._updateOrientation.bind(this));
         // 设置屏幕模式
         this.setScreenOrientation();
         // 设置tool显示
         this.setState({
             isEdit: (this.props.isEditable && this.props.fullMode) ? true : false
         });
+    }
+    componentWillUnmount() {
+        //Orientation.removeOrientationListener(this._updateOrientation);
+    }
+    _updateOrientation = (orientation) => {
+        if (Platform.OS === "android") {
+            if (orientation === "LANDSCAPE") {
+                this.setState({
+                    statusBarStyle: "light-content"
+                });
+            } else {
+                this.setState({
+                    statusBarStyle: "dark-content"
+                });
+            }
+        }
     }
     /**
      * 根据id查找item
@@ -166,6 +183,24 @@ class Container extends Component {
             statusBarStyle: this.state.isFull ? "dark-content" : "light-content"
         });
         this.finalizeDrawing(true);
+        // 如果当前处于全屏模式
+        if (this.state.isFull) {
+            this.onExitFullMode();
+        }
+    }
+    /**
+     * 退出全屏模式时的响应函数
+     *
+     * @memberof Container
+     */
+    onExitFullMode() {
+        // 如果是编辑模式
+        if (this.state.isEdit) {
+            let items = Utils.recalculateItems(this.state.items, 0 - this.offsetX, "reduce");
+            let newData = JSON.parse(JSON.stringify(this.dataModel));
+            newData.items = items;
+            this.props.onExitFullMode && this.props.onExitFullMode(JSON.stringify(newData));
+        }
     }
     /**
      * 根据模式设置屏幕为横竖屏
@@ -200,7 +235,11 @@ class Container extends Component {
             isEdit={this.state.isEdit}
             attachObjectEvent={(object) => this.needToListenerObjectEvent(object)}
             attachAddPathEvent={(object) => this.needToListenerAddPathEvent(object)}
-            onTextItemLayout={this.onTextItemLayout.bind(this)} />)
+            onTextItemLayout={this.onTextItemLayout.bind(this)}
+        />)
+    }
+    renderStatusBar() {
+        return (this.state.isFull && this.needRotate) ? <StatusBar translucent hidden={true} /> : <StatusBar translucent hidden={false} barStyle={this.state.statusBarStyle} />
     }
     /**
      *
@@ -212,10 +251,12 @@ class Container extends Component {
      */
     renderCanvasContent(fullScreenBgWidth, sketchpadHeight) {
         //alert(this.props.isEdit)
-        if (this.needRotate) {
+        let landscapeScreenStyle = { width: ScreenHeight, backgroundColor: "#000", flexDirection: "row", height: ScreenWidth, paddingLeft: Utils.isIPhoneXPaddTop(true) };
+        let portraitScreenStyle = { flex: 1, flexDirection: "column", paddingTop: Utils.isIPhoneXPaddTop() };
+        let contentStyle = this.needRotate ? landscapeScreenStyle : portraitScreenStyle;
+        if (this.state.isFull) {
             return (
-                <View style={{ width: ScreenHeight, backgroundColor: "#000", flexDirection: "row", height: ScreenWidth, paddingLeft: Utils.isIPhoneXPaddTop(true) }}>
-                    <StatusBar translucent hidden={true} />
+                <View style={contentStyle}>
                     {this.renderSketchpad(fullScreenBgWidth, sketchpadHeight)}
                     {this.renderTool()}
                     {this.renderTextEditView()}
@@ -223,15 +264,7 @@ class Container extends Component {
                 </View >
             )
         } else {
-            return (
-                <View style={{ flex: 1, flexDirection: "column", paddingTop: Utils.isIPhoneXPaddTop() }}>
-                    <StatusBar translucent hidden={false} barStyle={this.state.statusBarStyle} />
-                    {this.renderSketchpad(fullScreenBgWidth, sketchpadHeight)}
-                    {this.renderTool()}
-                    {this.renderTextEditView()}
-                    {this.renderToast(fullScreenBgWidth, sketchpadHeight)}
-                </View >
-            )
+            return null;
         }
     }
     continueDraw(item) {
@@ -317,16 +350,17 @@ class Container extends Component {
     }
     /**
      *
-     * @description 清空所有操作历史
+     * @description 清空所有画布上绘制元素
      * @memberof Container
      */
     removeHistory() {
-        this.history.backToInitialData();
+        //this.history.backToInitialData();
+        this.history.addOperationData([], "remove");
         let newItems = this.history.getAll();
         this.setState({
-            items: JSON.parse(JSON.stringify(newItems[0].data)),
+            items: JSON.parse(JSON.stringify(newItems[newItems.length - 1].data)),
             action: "read",
-            hasHistoryOperation: false
+            hasHistoryOperation: true
         });
     }
     undoLastOperation() {
@@ -504,6 +538,7 @@ class Container extends Component {
                     isEdit={this.state.isEdit} />
             </TouchableOpacity>
             <Modal isVisible={this.state.isFull} supportedOrientations={['portrait', 'landscape']} style={{ backgroundColor: "#000", margin: 0 }} animationIn="fadeIn" animationOut="fadeOut">
+                {this.renderStatusBar()}
                 {this.renderCanvasContent(fullScreenBgWidth, sketchpadHeight)}
             </Modal>
         </View >)

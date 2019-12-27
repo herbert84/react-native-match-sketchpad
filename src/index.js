@@ -33,7 +33,14 @@ class Sketchpad extends Component {
     }
     render() {
         return (<View>
-            <Container data={this.props.data} fullMode={this.props.fullMode} isEditable={this.props.isEditable} width={this.props.width} language={this.props.language} onExportToImage={(base64, cb) => this.props.onExportToImage(base64, cb)} />
+            <Container
+                data={this.props.data}
+                fullMode={this.props.fullMode}
+                isEditable={this.props.isEditable}
+                width={this.props.width}
+                language={this.props.language}
+                onExportToImage={(base64, cb) => this.props.onExportToImage(base64, cb)}
+                onExitFullMode={() => this.props.onExitFullMode} />
             {this.renderTools()}
         </View>)
     }

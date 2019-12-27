@@ -6,6 +6,7 @@ const isIphoneX =
     platform === "ios" && (deviceHeight === 812 || deviceWidth === 812 || deviceHeight === 896 || deviceWidth === 896);
 const styles = StyleSheet.create({
     rootView: {
+        backgroundColor: "rgba(0, 0, 0, .6)",
         position: "absolute",
         top: 0,
         left: 0
@@ -25,7 +26,12 @@ const styles = StyleSheet.create({
     textInputView: {
         flex: 1,
         width: "100%",
-        backgroundColor: "rgba(0, 0, 0, .6)",
+        // backgroundColor: "rgba(0, 0, 0, .6)",
+        justifyContent: "center"
+    },
+    textInputTouchArea: {
+        width: "100%",
+        height: "100%",
         justifyContent: "center"
     },
     textInput: {
@@ -33,7 +39,7 @@ const styles = StyleSheet.create({
         color: "#FFFFFF"
     },
     colorList: {
-        backgroundColor: "rgba(0, 0, 0, .6)",
+        // backgroundColor: "rgba(0, 0, 0, .6)",
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",

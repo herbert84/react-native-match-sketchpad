@@ -135,7 +135,7 @@ const Utils = {
         return (scaleType === "reduce") ? item.scale / scale : item.scale * scale;
     },
     getScaleNum(shape, type) {
-        let regPlayer = /^(red|blue|yelloe|green)[1-6].png$/;
+        let regPlayer = /^(red|blue|yellow|green)[1-6].png$/;
         switch (shape) {
             case "SketchpadText": scale = Math.pow(1.1, 5); break;
             case "SketchpadShape":
@@ -175,19 +175,36 @@ const Utils = {
         }
         return defaultValue;
     },
-    recalculateItems(items, offsetX) {
+    /**
+     * 当PC端的数据显示到APP端，或者APP端的数据回写到PC端时，对数据的坐标偏移量和放大倍率进行重新计算，以确保两边数据能够正确显示
+     *
+     * @param {*} items sketchpad的数据内容
+     * @param {*} offsetX 竖屏模式下X坐标的偏移量，PC端显示到APP端时应为正值，APP端回写到PC端是应为负值，横屏模式下应为0
+     * @param {*} scaleType 倍率缩放的类型，PC端显示到APP端时应为 "enlarge"，APP端回写到PC端是应为 "reduce"
+     * @returns
+     */
+    recalculateItems(items, offsetX, scaleType) {
         let newItems = [];
         for (var i in items) {
             let newItem = JSON.parse(JSON.stringify(items[i]));
+            let classNameArray = newItem.className.split(".");
+            let shape = classNameArray[classNameArray.length - 1];
             //处理points数组中的X坐标
             if (newItem.points) {
                 for (let i = 0; i < newItem.points.length - 1; i += 2) {
                     newItem.points[i] = newItem.points[i] - offsetX;
                 }
             }
-            newItem.scale = this.dataScale(newItem, "enlarge");
+            if (newItem.scale) {
+                newItem.scale = this.dataScale(newItem, scaleType);
+            }
             if (newItem.x) {
                 newItem.x = newItem.x - offsetX;
+            }
+            // SketchpadShape 类型的item,需要将xy坐标舍入为int
+            if (shape === "SketchpadShape") {
+                newItem.x = Math.round(newItem.x);
+                newItem.y = Math.round(newItem.y);
             }
             newItems.push(newItem)
         }

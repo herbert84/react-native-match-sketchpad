@@ -69,7 +69,8 @@ class Sketchpad extends Component {
                     data={data}
                     selectedId={this.props.selectedId}
                     attachObjectEvent={(object) => this.attachObjectEvent(object)}
-                    onTextLayout={(layout) => this.props.onTextItemLayout ? this.props.onTextItemLayout(data, layout) : null} />;
+                    onTextLayout={(layout) => this.props.onTextItemLayout ? this.props.onTextItemLayout(data, layout) : null}
+                />;
                 break;
             case "SketchpadPolygon": item = <Polygon data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
             case "SketchpadRectangle": item = <Rectangle data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Svg, Image, G, Rect } from 'react-native-svg';
 import * as _ from "lodash";
 import Utils from "./Utils";
-import Global from "./Global";
 
 class SketchObject extends Component {
     static propTypes = {
@@ -63,13 +62,12 @@ class SketchObject extends Component {
             case "SketchpadEllipse":
             case "SketchpadShape":
             case "SketchpadRectangle":
-            case "SketchpadText":
                 this.state = {
                     x: this.props.data.x * this.scaleFactor,
                     y: this.props.data.y * this.scaleFactor,
                     rotation: this.props.data.rotation,
                     isSelected
-                }
+                };
                 break;
             default: break;
         }

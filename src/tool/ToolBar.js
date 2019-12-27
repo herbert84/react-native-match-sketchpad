@@ -38,8 +38,8 @@ class ToolBar extends Component {
             itemSelectedIsBottom: false,
             itemSelectedId: null,
             itemSelected: false,
-            elementToolBarX: new Animated.Value(94),
-            shapeToolBarX: new Animated.Value(ScreenHeight)
+            elementToolBarX: new Animated.Value(94),// 点击元素按钮后展开及收拢的长度/宽度变化值
+            shapeToolBarX: new Animated.Value(ScreenHeight) // 点击图形后向上/向左展开及收拢的高度/宽度变化值
         }
     }
     componentWillReceiveProps(newProps) {
@@ -106,12 +106,13 @@ class ToolBar extends Component {
                     activeItem: item,
                     showShapeItems: item.nodes
                 });
-                this._showShapeTipView();
+                //this._showShapeTipView();
             } else {
                 this.setState({
                     showItemsModal: false
                 });
-                this._hiddenShapeTipView();
+                this._hiddenTipView();
+                //this._hiddenShapeTipView();
                 item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
                 item.backgroundColor = ColorMappings[this.state.selectedColorIndex].backgroundColor;  //设置选中的颜色
                 this.props.startDrawMode(item)
@@ -162,8 +163,8 @@ class ToolBar extends Component {
     finalizeDrawing() {
         this.setState({
             expandElementItems: false,
-            showElementItems: ToolElementItems
-        })
+            showElementItems: ToolElementItems,
+        });
         let needUpdateHistory = this.state.activeItem.shape === "SketchpadCurvedLine" || this.state.activeItem.shape === "SketchpadPolygon" ? true : false;
         this.props.onPressConfirmDrawing(needUpdateHistory);
     }
@@ -214,7 +215,7 @@ class ToolBar extends Component {
             //竖屏模式下，如果是线条，则显示四行，如果是区域则显示一行，否则显示两行
             let contentHeight = this.state.showItemsModalShape === "LINE" ? 296 : 187;
             let numColumns = (this.state.showItemsModalShape === "LINE") ? Math.ceil(this.state.showShapeItems.length / 4) : this.state.showItemsModalShape === "AREAS" ? 3 : Math.ceil(this.state.showShapeItems.length / 2);
-            return (<View style={{ position: "absolute", bottom: 0, height: contentHeight, width: "100%", backgroundColor: "#000" }}>
+            return (<View style={{ position: "absolute", bottom: 0, height: contentHeight, width: "100%", backgroundColor: "rgba(0,0,0,0.9)" }}>
                 {this.renderShapeSelectModalToolBar()}
                 {this.renderColorSelectionList()}
                 <ScrollView style={{ flexDirection: "row", paddingLeft: 16, paddingRight: 8 }} horizontal={true}>
@@ -228,7 +229,7 @@ class ToolBar extends Component {
                 </ScrollView>
             </View >)
         } else {
-            return (<View style={{ position: "absolute", right: 0, width: 229, height: ScreenWidth, backgroundColor: "#000" }}>
+            return (<View style={{ position: "absolute", right: 0, width: 229, height: ScreenWidth, backgroundColor: "rgba(0,0,0,0.9)" }}>
                 {this.renderShapeSelectModalToolBar()}
                 {this.renderColorSelectionList()}
                 {this.renderListContainer()}
@@ -343,7 +344,7 @@ class ToolBar extends Component {
                     />
                 </Animated.View>
                 <View style={styles.essentialBtnContainerInPortrait}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={this.props.items.length === 0 ? true : false} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
                     <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
@@ -352,12 +353,12 @@ class ToolBar extends Component {
         }
         else if (this.props.action === "drawing") {
             return (<View style={styles.containerEditReadInPortrait}>
-                <View style={[styles.elementContainer, { marginRight: btnElementMarginRightBottom, width: 94, height: 36, flexDirection: "row", alignItems: "center", justifyContent: "center" }]}>
+                <Animated.View style={[styles.elementContainer, { marginRight: btnElementMarginRightBottom, width: this.state.elementToolBarX, height: 36, flexDirection: "row", alignItems: "center", justifyContent: "center" }]}>
                     <Button onPress={() => this.onPressElementItem(this.state.activeItem)} imageSource={AppImageList[this.state.showItemsModalIcon]} />
                     <Button onPress={() => this.finalizeDrawing()} imageSource={AppImageList.endDrawing} />
-                </View>
+                </Animated.View>
                 <View style={styles.essentialBtnContainerInPortrait}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={this.props.items.length === 0 ? true : false} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
                     <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} /></View>
@@ -386,7 +387,7 @@ class ToolBar extends Component {
                     />
                 </Animated.View>
                 <View style={styles.essentialBtnContainerInLandscape}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={this.props.items.length === 0 ? true : false} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
                     <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
@@ -394,12 +395,12 @@ class ToolBar extends Component {
         }
         else if (this.props.action === "drawing") {
             return (<View style={styles.containerEditReadInLandscape}>
-                <View style={[styles.elementContainer, { marginBottom: btnElementMarginRightBottom, height: 94 }]}>
+                <Animated.View style={[styles.elementContainer, { marginBottom: btnElementMarginRightBottom, height: this.state.elementToolBarX }]}>
                     <Button onPress={() => this.onPressElementItem(this.state.activeItem)} imageSource={AppImageList[this.state.showItemsModalIcon]} />
                     <Button onPress={() => this.finalizeDrawing()} imageSource={AppImageList.endDrawing} />
-                </View>
+                </Animated.View>
                 <View style={styles.essentialBtnContainerInLandscape}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this.props.hasHistory} language={this.props.language} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={this.props.items.length === 0 ? true : false} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
                     <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
