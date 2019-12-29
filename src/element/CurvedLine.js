@@ -53,6 +53,7 @@ class CurvedLine extends Line {
         for (let i = 0, l = res.length; i < l; i += 2) {
             pathData += `L${res[i] * this.scaleFactor - this.minXPoint.x} ${res[i + 1] * this.scaleFactor - this.minYPoint.y} `;
         }
+        this.drawDash();
         //let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
         //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
         let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;

@@ -71,6 +71,7 @@ class StraightLine extends Line {
         //let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
         //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
         let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
+        this.drawDash();
         if (isTouchArea) {
             return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
         } else {
@@ -95,6 +96,7 @@ class StraightLine extends Line {
         //let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
         //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
         let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
+        this.drawDash();
         if (isTouchArea) {
             return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
         } else {
@@ -135,6 +137,7 @@ class StraightLine extends Line {
         //let color = this.state.isSelected ? this.props.selectedLineColor : this.props.data.color;
         let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
         //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
+        this.drawDash();
         if (isTouchArea) {
             return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
         } else {

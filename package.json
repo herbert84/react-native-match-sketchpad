@@ -1,6 +1,6 @@
 {
     "name": "react-native-match-sketchpad",
-    "version": "0.12.27",
+    "version": "0.12.29",
     "main": "index.js",
     "dependencies": {
         "lodash": "^4.17.15",

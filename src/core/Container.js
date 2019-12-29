@@ -48,7 +48,6 @@ class Container extends Component {
             isEdit: false,
             screenHeight: Dimensions.get("window").height,
             screenWidth: Dimensions.get("window").width,
-            statusBarStyle: "dark-content",
             action: "read", //当前画板出于的行为，诸如read, drawing, edit等等,
             itemSelected: false,
             selectedObjectShape: null,
@@ -179,8 +178,7 @@ class Container extends Component {
         this.setState({
             isFull: !this.state.isFull,
             isEdit: (this.props.isEditable && !this.state.isFull) ? true : false,
-            isPortrait: this.needRotate ? false : true,
-            statusBarStyle: this.state.isFull ? "dark-content" : "light-content"
+            isPortrait: this.needRotate ? false : true
         });
         this.finalizeDrawing(true);
         // 如果当前处于全屏模式
@@ -239,7 +237,8 @@ class Container extends Component {
         />)
     }
     renderStatusBar() {
-        return (this.state.isFull && this.needRotate) ? <StatusBar translucent hidden={true} /> : <StatusBar translucent hidden={false} barStyle={this.state.statusBarStyle} />
+        let statusBarStyle = "light-content";
+        return (this.state.isFull && this.needRotate) ? <StatusBar translucent hidden={true} /> : <StatusBar translucent hidden={false} barStyle={statusBarStyle} />
     }
     /**
      *

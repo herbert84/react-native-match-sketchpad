@@ -70,7 +70,7 @@ class DataModel {
                 lineWidth: item.lineWidth || 1,
                 style: item.style || [],
                 visible: true,
-                points: [0, 0, 0, 0],
+                points: [-30, -30, -30, -30],
                 z: 0,
                 color: item.color,
                 startArrow: item.startArrow || false,

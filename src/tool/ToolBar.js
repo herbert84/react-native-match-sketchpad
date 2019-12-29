@@ -4,7 +4,8 @@ import * as _ from "lodash";
 import Utils from "../core/Utils";
 import Button from "../component/Button";
 import AppImageList from "../core/AppImageList";
-import ToolElementItems from "../data/ToolElement";
+import ToolElementItemsPortrait from "../data/ToolElementPortrait";
+import ToolElementItemsLandscape from "../data/ToolElementLandscape";
 import ToolElementSelectedItems from "../data/ToolElementSelected";
 import ColorMappings from "../data/ColorMappings";
 import Remove from "./Remove";
@@ -21,11 +22,17 @@ let ScreenWidth = Dimensions.get("window").width;
 let ScreenHeight = Dimensions.get("window").height;
 let btnElementMarginRightBottom = ScreenWidth - 16 - 16 - 210 - 94;
 
+const COLOR_BLACK_INDEX = 4;
+
 class ToolBar extends Component {
     constructor(props) {
         super(props);
+        this.defauleColorIndex = {
+            "LINE": COLOR_BLACK_INDEX,
+            "AREAS": COLOR_BLACK_INDEX
+        };
         this.state = {
-            showElementItems: ToolElementItems,
+            showElementItems: this.props.isPortrait ? ToolElementItemsPortrait : ToolElementItemsLandscape,
             expandElementItems: false, //是否展开元素二级菜单
             showItemsModal: false, //是否显示元素蒙层
             showShapeItems: [], //图形元素列表
@@ -33,7 +40,7 @@ class ToolBar extends Component {
             showItemsModalShape: "", //元素蒙层形状
             showItemsModalIcon: "", //元素蒙层图标
             activeItem: null, //当前被激活的元素,
-            selectedColorIndex: 4,  //选中的颜色的索引位置，默认选中黑色
+            selectedColorIndex: COLOR_BLACK_INDEX,  //选中的颜色的索引位置，默认选中黑色
             itemSelectedIsTop: false,
             itemSelectedIsBottom: false,
             itemSelectedId: null,
@@ -115,19 +122,20 @@ class ToolBar extends Component {
                 //this._hiddenShapeTipView();
                 item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
                 item.backgroundColor = ColorMappings[this.state.selectedColorIndex].backgroundColor;  //设置选中的颜色
+                this.defauleColorIndex[this.state.showItemsModalShape] = this.state.selectedColorIndex;  // 记住本次绘制所选择的颜色
                 this.props.startDrawMode(item)
             }
         } else {
             if (this.state.expandElementItems) {
                 this.setState({
                     expandElementItems: false,
-                    showElementItems: ToolElementItems
+                    showElementItems: this.props.isPortrait ? ToolElementItemsPortrait : ToolElementItemsLandscape
                 })
                 this._hiddenTipView()
             } else {
                 this.setState({
                     expandElementItems: true,
-                    showElementItems: ToolElementItems[0].nodes
+                    showElementItems: this.props.isPortrait ? ToolElementItemsPortrait[0].nodes : ToolElementItemsLandscape[0].nodes
                 });
                 this._showTipView()
             }
@@ -141,6 +149,17 @@ class ToolBar extends Component {
         let title = Utils.getTranslatedText("LABEL", item.key, this.props.language)
 
         return <View style={{ width, height, alignItems: "center", justifyContent: "center" }}><Button isPortrait={this.props.isPortrait} imageSource={AppImageList[img]} onPress={() => this.onPressElementItem(item)} label={item.showTitle ? title : null} language={this.props.language} /></View>
+    }
+    /**
+     * 点击返回按钮的响应函数
+     *
+     * @memberof ToolBar
+     */
+    onPressCancel() {
+        this.setState({
+            showItemsModal: false,
+            selectedColorIndex: this.defauleColorIndex[this.state.showItemsModalShape]  // 点击返回时，重置颜色选择为上一次成功绘制的颜色
+        });
     }
     renderToolItem(item) {
         let itemStyle = this.props.isPortrait ? { marginRight: 22 } : { marginBottom: 22 };
@@ -161,9 +180,11 @@ class ToolBar extends Component {
         this.props.onPressSwitchSize();
     }
     finalizeDrawing() {
+        this.defauleColorIndex[this.state.showItemsModalShape] = COLOR_BLACK_INDEX;  // 绘制结束的时候重置颜色选择
         this.setState({
             expandElementItems: false,
-            showElementItems: ToolElementItems,
+            showElementItems: this.props.isPortrait ? ToolElementItemsPortrait : ToolElementItemsLandscape,
+            selectedColorIndex: this.defauleColorIndex[this.state.showItemsModalShape]
         });
         let needUpdateHistory = this.state.activeItem.shape === "SketchpadCurvedLine" || this.state.activeItem.shape === "SketchpadPolygon" ? true : false;
         this.props.onPressConfirmDrawing(needUpdateHistory);
@@ -201,7 +222,7 @@ class ToolBar extends Component {
         let paddingLeftRight = this.props.isPortrait ? 16 : 24;
         return (<View style={{ flexDirection: "row", paddingTop: 16, paddingBottom: 16, paddingLeft: paddingLeftRight, paddingRight: paddingLeftRight, "justifyContent": "space-between" }}>
             <Text style={styles.modalLabel}>{this.state.showItemsModalLabel}</Text>
-            <Text style={styles.modalLabel} onPress={() => { this.setState({ showItemsModal: false }); }}>{Utils.getTranslatedText("BUTTON", "CANCEL", this.props.language)}</Text>
+            <Text style={styles.modalLabel} onPress={this.onPressCancel.bind(this)}>{Utils.getTranslatedText("BUTTON", "CANCEL", this.props.language)}</Text>
         </View>)
     }
     /**

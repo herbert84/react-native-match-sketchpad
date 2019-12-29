@@ -1,4 +1,4 @@
-const ToolElementItems = [{
+const ToolElementItemsLandscape = [{
     "title": "元素",
     "showTitle": true,
     "key": "ELEMENT",
@@ -281,60 +281,6 @@ const ToolElementItems = [{
                     "shape": "SketchpadShape"
                 },
                 {
-                    "title": "球员1",
-                    "type": "/sap/sports/trm/ui/catalog/images/yellow1.png",
-                    "image": "yellow1",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "title": "球员2",
-                    "type": "/sap/sports/trm/ui/catalog/images/yellow2.png",
-                    "image": "yellow2",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "title": "球员3",
-                    "type": "/sap/sports/trm/ui/catalog/images/yellow3.png",
-                    "image": "yellow3",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "title": "球员1",
-                    "type": "/sap/sports/trm/ui/catalog/images/green1.png",
-                    "image": "green1",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "title": "球员2",
-                    "type": "/sap/sports/trm/ui/catalog/images/green2.png",
-                    "image": "green2",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "title": "球员3",
-                    "type": "/sap/sports/trm/ui/catalog/images/green3.png",
-                    "image": "green3",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "title": "球员1",
-                    "type": "/sap/sports/trm/ui/catalog/images/blue1.png",
-                    "image": "blue1",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "title": "球员2",
-                    "type": "/sap/sports/trm/ui/catalog/images/blue2.png",
-                    "image": "blue2",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "title": "球员3",
-                    "type": "/sap/sports/trm/ui/catalog/images/blue3.png",
-                    "image": "blue3",
-                    "shape": "SketchpadShape"
-                },
-                {
                     "title": "球员4",
                     "type": "/sap/sports/trm/ui/catalog/images/red4.png",
                     "image": "red4",
@@ -350,6 +296,24 @@ const ToolElementItems = [{
                     "title": "球员6",
                     "type": "/sap/sports/trm/ui/catalog/images/red6.png",
                     "image": "red6",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "title": "球员1",
+                    "type": "/sap/sports/trm/ui/catalog/images/yellow1.png",
+                    "image": "yellow1",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "title": "球员2",
+                    "type": "/sap/sports/trm/ui/catalog/images/yellow2.png",
+                    "image": "yellow2",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "title": "球员3",
+                    "type": "/sap/sports/trm/ui/catalog/images/yellow3.png",
+                    "image": "yellow3",
                     "shape": "SketchpadShape"
                 },
                 {
@@ -371,6 +335,24 @@ const ToolElementItems = [{
                     "shape": "SketchpadShape"
                 },
                 {
+                    "title": "球员1",
+                    "type": "/sap/sports/trm/ui/catalog/images/green1.png",
+                    "image": "green1",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "title": "球员2",
+                    "type": "/sap/sports/trm/ui/catalog/images/green2.png",
+                    "image": "green2",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "title": "球员3",
+                    "type": "/sap/sports/trm/ui/catalog/images/green3.png",
+                    "image": "green3",
+                    "shape": "SketchpadShape"
+                },
+                {
                     "title": "球员4",
                     "type": "/sap/sports/trm/ui/catalog/images/green4.png",
                     "image": "green4",
@@ -386,6 +368,24 @@ const ToolElementItems = [{
                     "title": "球员6",
                     "type": "/sap/sports/trm/ui/catalog/images/green6.png",
                     "image": "green6",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "title": "球员1",
+                    "type": "/sap/sports/trm/ui/catalog/images/blue1.png",
+                    "image": "blue1",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "title": "球员2",
+                    "type": "/sap/sports/trm/ui/catalog/images/blue2.png",
+                    "image": "blue2",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "title": "球员3",
+                    "type": "/sap/sports/trm/ui/catalog/images/blue3.png",
+                    "image": "blue3",
                     "shape": "SketchpadShape"
                 },
                 {
@@ -429,6 +429,21 @@ const ToolElementItems = [{
                     "shape": "SketchpadShape"
                 },
                 {
+                    "type": "/sap/sports/trm/ui/catalog/images/gymnastics_box.png",
+                    "image": "gymnasticsBox",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "type": "/sap/sports/trm/ui/catalog/images/obstacle.png",
+                    "image": "obstacle",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "type": "/sap/sports/trm/ui/catalog/images/goal1.png",
+                    "image": "goal1",
+                    "shape": "SketchpadShape"
+                },
+                {
                     "type": "/sap/sports/trm/ui/catalog/images/goal2.png",
                     "image": "goal2",
                     "shape": "SketchpadShape"
@@ -441,6 +456,31 @@ const ToolElementItems = [{
                 {
                     "type": "/sap/sports/trm/ui/catalog/images/pole_red.png",
                     "image": "poleRed",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "type": "/sap/sports/trm/ui/catalog/images/pole_black.png",
+                    "image": "poleBlack",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "type": "/sap/sports/trm/ui/catalog/images/flag.png",
+                    "image": "flag",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "type": "/sap/sports/trm/ui/catalog/images/cross.png",
+                    "image": "cross",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "type": "/sap/sports/trm/ui/catalog/images/coordination_ladder2.png",
+                    "image": "coordinationLadder2",
+                    "shape": "SketchpadShape"
+                },
+                {
+                    "type": "/sap/sports/trm/ui/catalog/images/coordination_ladder1.png",
+                    "image": "coordinationLadder1",
                     "shape": "SketchpadShape"
                 },
                 {
@@ -459,51 +499,6 @@ const ToolElementItems = [{
                     "shape": "SketchpadShape"
                 },
                 {
-                    "type": "/sap/sports/trm/ui/catalog/images/cone_grey_big.png",
-                    "image": "coneGreyBig",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "type": "/sap/sports/trm/ui/catalog/images/cross.png",
-                    "image": "cross",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "type": "/sap/sports/trm/ui/catalog/images/coordination_ladder2.png",
-                    "image": "coordinationLadder2",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "type": "/sap/sports/trm/ui/catalog/images/gymnastics_box.png",
-                    "image": "gymnasticsBox",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "type": "/sap/sports/trm/ui/catalog/images/obstacle.png",
-                    "image": "obstacle",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "type": "/sap/sports/trm/ui/catalog/images/goal1.png",
-                    "image": "goal1",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "type": "/sap/sports/trm/ui/catalog/images/pole_black.png",
-                    "image": "poleBlack",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "type": "/sap/sports/trm/ui/catalog/images/flag.png",
-                    "image": "flag",
-                    "shape": "SketchpadShape"
-                },
-                {
-                    "type": "/sap/sports/trm/ui/catalog/images/circle.png",
-                    "image": "circle",
-                    "shape": "SketchpadShape"
-                },
-                {
                     "type": "/sap/sports/trm/ui/catalog/images/cone_red.png",
                     "image": "coneRed",
                     "shape": "SketchpadShape"
@@ -519,6 +514,11 @@ const ToolElementItems = [{
                     "shape": "SketchpadShape"
                 },
                 {
+                    "type": "/sap/sports/trm/ui/catalog/images/cone_grey_big.png",
+                    "image": "coneGreyBig",
+                    "shape": "SketchpadShape"
+                },
+                {
                     "type": "/sap/sports/trm/ui/catalog/images/cone_grey.png",
                     "image": "coneGrey",
                     "shape": "SketchpadShape"
@@ -529,11 +529,11 @@ const ToolElementItems = [{
                     "shape": "SketchpadShape"
                 },
                 {
-                    "type": "/sap/sports/trm/ui/catalog/images/coordination_ladder1.png",
-                    "image": "coordinationLadder1",
+                    "type": "/sap/sports/trm/ui/catalog/images/circle.png",
+                    "image": "circle",
                     "shape": "SketchpadShape"
                 }
             ]
         }]
 }];
-export default ToolElementItems;
+export default ToolElementItemsLandscape;

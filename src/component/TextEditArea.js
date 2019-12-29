@@ -70,7 +70,7 @@ class TextEditArea extends Component {
         Animated.parallel([
             Animated.timing(this.rootViewPaddingBottom, {
                 duration: 250,
-                toValue: event.endCoordinates.height,
+                toValue: event.endCoordinates.height + (this.props.isPortrait ? 21 : 0),
             }),
         ]).start();
     };

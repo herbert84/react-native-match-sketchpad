@@ -201,10 +201,15 @@ const Utils = {
             if (newItem.x) {
                 newItem.x = newItem.x - offsetX;
             }
-            // SketchpadShape 类型的item,需要将xy坐标舍入为int
-            if (shape === "SketchpadShape") {
+            // 为了兼容PC端，将各个类型的item的坐标以及尺寸舍入为int
+            if (shape === "SketchpadShape" || shape === "SketchpadText") {
                 newItem.x = Math.round(newItem.x);
                 newItem.y = Math.round(newItem.y);
+            } else if (shape === "SketchpadRectangle" || shape === "SketchpadEllipse") {
+                newItem.x = Math.round(newItem.x);
+                newItem.y = Math.round(newItem.y);
+                newItem.width = Math.round(newItem.width);
+                newItem.height = Math.round(newItem.height);
             }
             newItems.push(newItem)
         }

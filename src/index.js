@@ -40,7 +40,7 @@ class Sketchpad extends Component {
                 width={this.props.width}
                 language={this.props.language}
                 onExportToImage={(base64, cb) => this.props.onExportToImage(base64, cb)}
-                onExitFullMode={() => this.props.onExitFullMode} />
+                onExitFullMode={this.props.onExitFullMode} />
             {this.renderTools()}
         </View>)
     }

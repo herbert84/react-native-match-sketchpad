@@ -50,6 +50,13 @@ class Line extends SketchObject {
     lineLength(x2, y2, x1, y1) {
         return Math.sqrt((x2 -= x1) * x2 + (y2 -= y1) * y2);
     }
+    drawDash() {
+        if (this.props.data.style && this.props.data.style.length === 1) {
+            this.strokeDasharray = [this.props.data.style[0], this.props.data.style[0]];
+        } else {
+            this.strokeDasharray = []
+        }
+    }
     /**
      * 使用Path组件绘制箭头
      *

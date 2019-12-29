@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { PanResponder, DeviceEventEmitter } from "react-native";
+import { PanResponder } from "react-native";
 import PropTypes from 'prop-types';
 import { Svg, Image, G, Rect } from 'react-native-svg';
 import * as _ from "lodash";
@@ -25,7 +25,7 @@ class SketchObject extends Component {
         this.initShape(false)
     }
     componentDidMount() {
-        console.log("this.isEdit:" + this.isEdit)
+        //console.log("this.isEdit:" + this.isEdit)
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.selectedId === this.props.data.id) {
@@ -93,17 +93,16 @@ class SketchObject extends Component {
         }
     }
     _handlePanResponderMove = (e, gestureState) => {
+        let newX = this._previousX + gestureState.dx;
+        let newY = this._previousY + gestureState.dy;
         this.setState({
-            x: this._previousX + gestureState.dx,
-            y: this._previousY + gestureState.dy
+            x: newX,
+            y: newY
         });
         //let shape = Utils.getItemType(this.props.data);
-        //DeviceEventEmitter.emit("sketchobject_" + Global.instanceId, JSON.stringify({ selectedId: this.props.data.id, type: shape, item: this.props.data }))
     };
 
     _handlePanResponderGrant = () => {
-        //console.log(this.props.data.x * this.scaleFactor)
-        //console.log(this.props.data.y * this.scaleFactor)
         this._previousX = this.state.x;
         this._previousY = this.state.y;
         this.setState({
@@ -113,7 +112,6 @@ class SketchObject extends Component {
     };
 
     _handlePanResponderEnd = (e, gestureState) => {
-        //console.log(this.state.x + ":" + this.state.y);
         //this._previousX += gestureState.dx;
         //this._previousY += gestureState.dy;
         /*this.setState({
@@ -123,7 +121,7 @@ class SketchObject extends Component {
         let shape = Utils.getItemType(this.props.data);
         if (shape === "SketchpadPolygon") {
             let deltaX = (this.state.x - this.minXPoint.x) / this.scaleFactor;
-            let deltaY = (this.state.y - this.minXPoint.y) / this.scaleFactor;
+            let deltaY = (this.state.y - this.minYPoint.y) / this.scaleFactor;
 
             let objectData = this.props.data;
             let newPoints = [];
