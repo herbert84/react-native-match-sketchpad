@@ -88,9 +88,9 @@ class SketchObject extends Component {
         }
     }
     componentWillUnmount() {
-        if (this.objectListener) {
+        /*if (this.objectListener) {
             this.objectListener.remove();
-        }
+        }*/
     }
     _handlePanResponderMove = (e, gestureState) => {
         let newX = this._previousX + gestureState.dx;

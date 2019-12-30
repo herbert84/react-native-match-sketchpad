@@ -61,7 +61,7 @@ class Container extends Component {
     componentDidMount() {
         //Orientation.addOrientationListener(this._updateOrientation.bind(this));
         // 设置屏幕模式
-        this.setScreenOrientation();
+        //this.setScreenOrientation();
         // 设置tool显示
         this.setState({
             isEdit: (this.props.isEditable && this.props.fullMode) ? true : false
@@ -526,16 +526,15 @@ class Container extends Component {
         let canvasWidth = this.props.width || 400;
         let canvasHeight = (this.needRotate) ? canvasWidth * (1251 / 1960) : canvasWidth * (1960 / 1251);
         return (<View style={{ width: canvasWidth, height: canvasHeight }}>
-            <TouchableOpacity onPress={() => this.switchSizeMode()}>
-                <Sketchpad
-                    onSvgRef={(svgRef) => this.svgRef = svgRef}
-                    isPortrait={this.state.isPortrait}
-                    width={canvasWidth}
-                    height={canvasHeight}
-                    bg={this.dataModel.background}
-                    items={this.state.items}
-                    isEdit={this.state.isEdit} />
-            </TouchableOpacity>
+            <Sketchpad
+                onSvgRef={(svgRef) => this.svgRef = svgRef}
+                isPortrait={this.state.isPortrait}
+                width={canvasWidth}
+                height={canvasHeight}
+                bg={this.dataModel.background}
+                items={this.state.items}
+                isEdit={this.state.isEdit} />
+            <TouchableOpacity onPress={() => this.switchSizeMode()} style={{ position: "absolute", top: 0, bottom: 0, width: canvasWidth, height: canvasHeight }}></TouchableOpacity>
             <Modal isVisible={this.state.isFull} supportedOrientations={['portrait', 'landscape']} style={{ backgroundColor: "#000", margin: 0 }} animationIn="fadeIn" animationOut="fadeOut">
                 {this.renderStatusBar()}
                 {this.renderCanvasContent(fullScreenBgWidth, sketchpadHeight)}

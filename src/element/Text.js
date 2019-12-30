@@ -25,6 +25,8 @@ class SketchText extends SketchObject {
         super(props);
 
         this.state = {
+            x: props.data.x * this.scaleFactor,
+            y: props.data.y * this.scaleFactor,
             pressTextCount: 0,
             isTextMeasured: false,
             touchAreaX: 0,

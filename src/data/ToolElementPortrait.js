@@ -22,33 +22,48 @@ const ToolElementItemsPortrait = [{
                     "image": "simpleLine"
                 },
                 {
-                    "title": "单直线带开始箭头",
-                    "shape": "SketchpadStraightLine",
-                    "type": "simple",
-                    "startArrow": true,
-                    "image": "simpleLineStartArrow"
-                },
-                {
-                    "title": "单直线带结束箭头",
-                    "shape": "SketchpadStraightLine",
-                    "type": "simple",
-                    "endArrow": true,
-                    "image": "simpleLineEndArrow"
-                },
-                {
-                    "title": "单直线带双箭头",
-                    "shape": "SketchpadStraightLine",
-                    "type": "simple",
-                    "startArrow": true,
-                    "endArrow": true,
-                    "image": "simpleLineBothArrow"
-                },
-                {
                     "title": "单直线虚线",
                     "shape": "SketchpadStraightLine",
                     "type": "simple",
                     "style": [4],
                     "image": "simpleDashLine"
+                },
+                {
+                    "title": "曲线",
+                    "shape": "SketchpadCurvedLine",
+                    "image": "curvedLine"
+                },
+                {
+                    "title": "曲线虚线",
+                    "shape": "SketchpadCurvedLine",
+                    "style": [4],
+                    "image": "curvedDashLine"
+                },
+                {
+                    "title": "波浪线",
+                    "shape": "SketchpadStraightLine",
+                    "type": "sinus",
+                    "image": "sinusLine"
+                },
+                {
+                    "title": "单直线粗线",
+                    "shape": "SketchpadStraightLine",
+                    "lineWidth": 3,
+                    "type": "simple",
+                    "image": "boldLine"
+                },
+                {
+                    "title": "双直线",
+                    "shape": "SketchpadStraightLine",
+                    "type": "double",
+                    "image": "doubleLine"
+                },
+                {
+                    "title": "单直线带开始箭头",
+                    "shape": "SketchpadStraightLine",
+                    "type": "simple",
+                    "startArrow": true,
+                    "image": "simpleLineStartArrow"
                 },
                 {
                     "title": "单直线虚线带开始箭头",
@@ -59,12 +74,97 @@ const ToolElementItemsPortrait = [{
                     "image": "simpleDashLineStartArrow"
                 },
                 {
+                    "title": "曲线带开始箭头",
+                    "shape": "SketchpadCurvedLine",
+                    "startArrow": true,
+                    "image": "curvedLineStartArrow"
+                },
+                {
+                    "title": "曲线虚线带开始箭头",
+                    "shape": "SketchpadCurvedLine",
+                    "style": [4],
+                    "startArrow": true,
+                    "image": "curvedDashLineStartArrow"
+                },
+                {
+                    "title": "波浪线带开始箭头",
+                    "shape": "SketchpadStraightLine",
+                    "type": "sinus",
+                    "startArrow": true,
+                    "image": "sinusLineStartArrow"
+                },
+                {
+                    "title": "单直线粗线带开始箭头",
+                    "shape": "SketchpadStraightLine",
+                    "lineWidth": 3,
+                    "type": "simple",
+                    "startArrow": true,
+                    "image": "boldLineStartArrow"
+                },
+                {
+                    "title": "双直线带开始箭头",
+                    "shape": "SketchpadStraightLine",
+                    "type": "double",
+                    "startArrow": true,
+                    "image": "doubleLineStartArrow"
+                },
+                {
+                    "title": "单直线带结束箭头",
+                    "shape": "SketchpadStraightLine",
+                    "type": "simple",
+                    "endArrow": true,
+                    "image": "simpleLineEndArrow"
+                },
+                {
                     "title": "单直线虚线带结束箭头",
                     "shape": "SketchpadStraightLine",
                     "type": "simple",
                     "endArrow": true,
                     "style": [4],
                     "image": "simpleDashLineEndArrow"
+                },
+                {
+                    "title": "曲线带结束箭头",
+                    "shape": "SketchpadCurvedLine",
+                    "endArrow": true,
+                    "image": "curvedLineEndArrow"
+                },
+                {
+                    "title": "曲线虚线带结束箭头",
+                    "shape": "SketchpadCurvedLine",
+                    "style": [4],
+                    "endArrow": true,
+                    "image": "curvedDashLineEndArrow"
+                },
+                {
+                    "title": "波浪线带结束箭头",
+                    "shape": "SketchpadStraightLine",
+                    "type": "sinus",
+                    "endArrow": true,
+                    "image": "sinusLineEndArrow"
+                },
+                {
+                    "title": "单直线粗线带结束箭头",
+                    "shape": "SketchpadStraightLine",
+                    "lineWidth": 3,
+                    "type": "simple",
+                    "endArrow": true,
+                    "image": "boldLineEndArrow"
+                },
+                {
+                    "title": "双直线带结束箭头",
+                    "shape": "SketchpadStraightLine",
+                    "type": "double",
+                    "endArrow": true,
+                    "image": "doubleLineEndArrow"
+                },
+                {
+                    "title": "单直线带双箭头",
+                    "shape": "SketchpadStraightLine",
+                    "type": "simple",
+                    "startArrow": true,
+                    "endArrow": true,
+                    "image": "simpleLineBothArrow"
                 },
                 {
                     "title": "单直线虚线带双箭头",
@@ -76,48 +176,11 @@ const ToolElementItemsPortrait = [{
                     "image": "simpledashLineBothArrow"
                 },
                 {
-                    "title": "曲线",
-                    "shape": "SketchpadCurvedLine",
-                    "image": "curvedLine"
-                },
-                {
-                    "title": "曲线带开始箭头",
-                    "shape": "SketchpadCurvedLine",
-                    "startArrow": true,
-                    "image": "curvedLineStartArrow"
-                },
-                {
-                    "title": "曲线带结束箭头",
-                    "shape": "SketchpadCurvedLine",
-                    "endArrow": true,
-                    "image": "curvedLineEndArrow"
-                },
-                {
                     "title": "曲线带双箭头",
                     "shape": "SketchpadCurvedLine",
                     "startArrow": true,
                     "endArrow": true,
                     "image": "curvedLineBothArrow"
-                },
-                {
-                    "title": "曲线虚线",
-                    "shape": "SketchpadCurvedLine",
-                    "style": [4],
-                    "image": "curvedDashLine"
-                },
-                {
-                    "title": "曲线虚线带开始箭头",
-                    "shape": "SketchpadCurvedLine",
-                    "style": [4],
-                    "startArrow": true,
-                    "image": "curvedDashLineStartArrow"
-                },
-                {
-                    "title": "曲线虚线带结束箭头",
-                    "shape": "SketchpadCurvedLine",
-                    "style": [4],
-                    "endArrow": true,
-                    "image": "curvedDashLineEndArrow"
                 },
                 {
                     "title": "曲线虚线带双箭头",
@@ -128,55 +191,12 @@ const ToolElementItemsPortrait = [{
                     "image": "curvedDashLineBothArrow"
                 },
                 {
-                    "title": "波浪线",
-                    "shape": "SketchpadStraightLine",
-                    "type": "sinus",
-                    "image": "sinusLine"
-                },
-                {
-                    "title": "波浪线带开始箭头",
-                    "shape": "SketchpadStraightLine",
-                    "type": "sinus",
-                    "startArrow": true,
-                    "image": "sinusLineStartArrow"
-                },
-                {
-                    "title": "波浪线带结束箭头",
-                    "shape": "SketchpadStraightLine",
-                    "type": "sinus",
-                    "endArrow": true,
-                    "image": "sinusLineEndArrow"
-                },
-                {
                     "title": "波浪线带双箭头",
                     "shape": "SketchpadStraightLine",
                     "type": "sinus",
                     "startArrow": true,
                     "endArrow": true,
                     "image": "sinusLineBothArrow"
-                },
-                {
-                    "title": "单直线粗线",
-                    "shape": "SketchpadStraightLine",
-                    "lineWidth": 3,
-                    "type": "simple",
-                    "image": "boldLine"
-                },
-                {
-                    "title": "单直线粗线带开始箭头",
-                    "shape": "SketchpadStraightLine",
-                    "lineWidth": 3,
-                    "type": "simple",
-                    "startArrow": true,
-                    "image": "boldLineStartArrow"
-                },
-                {
-                    "title": "单直线粗线带结束箭头",
-                    "shape": "SketchpadStraightLine",
-                    "lineWidth": 3,
-                    "type": "simple",
-                    "endArrow": true,
-                    "image": "boldLineEndArrow"
                 },
                 {
                     "title": "单直线粗线带双箭头",
@@ -186,26 +206,6 @@ const ToolElementItemsPortrait = [{
                     "startArrow": true,
                     "endArrow": true,
                     "image": "boldLineBothArrow"
-                },
-                {
-                    "title": "双直线",
-                    "shape": "SketchpadStraightLine",
-                    "type": "double",
-                    "image": "doubleLine"
-                },
-                {
-                    "title": "双直线带开始箭头",
-                    "shape": "SketchpadStraightLine",
-                    "type": "double",
-                    "startArrow": true,
-                    "image": "doubleLineStartArrow"
-                },
-                {
-                    "title": "双直线带结束箭头",
-                    "shape": "SketchpadStraightLine",
-                    "type": "double",
-                    "endArrow": true,
-                    "image": "doubleLineEndArrow"
                 },
                 {
                     "title": "双直线带双箭头",

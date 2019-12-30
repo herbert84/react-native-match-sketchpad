@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text } from "react-native";
+import { View, Text, Platform } from "react-native";
 import PropTypes from 'prop-types';
 import SketchObject from "../core/Object";
 import {
@@ -20,9 +20,9 @@ class Line extends SketchObject {
     constructor(props) {
         super(props);
         // 初始化虚线样式
-        if (props.data.style && props.data.style.length === 1) {
+        /*if (props.data.style && props.data.style.length === 1) {
             this.strokeDasharray = [props.data.style[0], props.data.style[0]];
-        }
+        }*/
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.selectedId === this.props.data.id) {
@@ -54,7 +54,8 @@ class Line extends SketchObject {
         if (this.props.data.style && this.props.data.style.length === 1) {
             this.strokeDasharray = [this.props.data.style[0], this.props.data.style[0]];
         } else {
-            this.strokeDasharray = []
+            if (Platform.OS === "ios")
+                this.strokeDasharray = []
         }
     }
     /**
@@ -100,14 +101,14 @@ class Line extends SketchObject {
         let { points } = this.props.data;
         if (points && points.length >= 4) {
             let l = points.length;
-            if (this.props.data.startArrow) {
+            if (this.props.data.endArrow) {
                 result.push(this.drawArrow(
                     points[l - 4] * this.scaleFactor - minX,
                     points[l - 3] * this.scaleFactor - minY,
                     points[l - 2] * this.scaleFactor - minX,
                     points[l - 1] * this.scaleFactor - minY));
             }
-            if (this.props.data.endArrow) {
+            if (this.props.data.startArrow) {
                 result.push(this.drawArrow(
                     points[2] * this.scaleFactor - minX,
                     points[3] * this.scaleFactor - minY,

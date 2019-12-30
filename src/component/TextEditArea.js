@@ -26,7 +26,7 @@ class TextEditArea extends Component {
         this.state = {
             textInputHeight: 20,
             value: props.data.text,
-            selectedColorIndex: 4
+            selectedColorIndex: 5
         };
     }
 
