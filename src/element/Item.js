@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-    Image as RNImage,
+    Image as RNImage, Platform,
 } from 'react-native';
 import SketchObject from "../core/Object";
 import Svg, { Image, G, Path, Rect, Text } from 'react-native-svg';
@@ -38,14 +38,37 @@ class Item extends SketchObject {
         if (this.props.data.status === "drawing") {
             return null;
         } else {
-            return this.objectContainer(<Image
+            let result = [];
+            result.push(<Image
                 x="0"
                 y="0"
                 width={bgImage.width * this.scaleFactor * this.props.data.scale}
                 height={bgImage.height * this.scaleFactor * this.props.data.scale}
                 href={Utils.loadImage(this.props.data.image, this.props.data.mirror)}
                 onPress={() => this.objectOnPress()}
-            />, rect)
+            />)
+            result.push(<Rect x="0"
+                y="0"
+                width={rectWidth}
+                height={rectHeight}
+                fill="none"
+                fillOpacity="0.1"
+                stroke="none"
+                strokeWidth="1"
+                strokeOpacity="0.1"
+                onPress={() => this.objectOnPress()}></Rect>);
+            if (Platform.OS === "ios") {
+                return this.objectContainer(result, rect)
+            } else {
+                return this.objectContainer(<Image
+                    x="0"
+                    y="0"
+                    width={bgImage.width * this.scaleFactor * this.props.data.scale}
+                    height={bgImage.height * this.scaleFactor * this.props.data.scale}
+                    href={Utils.loadImage(this.props.data.image, this.props.data.mirror)}
+                    onPress={() => this.objectOnPress()}
+                />, rect)
+            }
         }
     }
 }

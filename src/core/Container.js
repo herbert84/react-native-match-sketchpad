@@ -61,7 +61,7 @@ class Container extends Component {
     componentDidMount() {
         //Orientation.addOrientationListener(this._updateOrientation.bind(this));
         // 设置屏幕模式
-        //this.setScreenOrientation();
+        this.setScreenOrientation();
         // 设置tool显示
         this.setState({
             isEdit: (this.props.isEditable && this.props.fullMode) ? true : false
@@ -237,7 +237,7 @@ class Container extends Component {
         />)
     }
     renderStatusBar() {
-        let statusBarStyle = "light-content";
+        let statusBarStyle = (Platform.OS === "ios") ? "light-content" : "dark-content";
         return (this.state.isFull && this.needRotate) ? <StatusBar translucent hidden={true} /> : <StatusBar translucent hidden={false} barStyle={statusBarStyle} />
     }
     /**
@@ -312,8 +312,15 @@ class Container extends Component {
             let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
             //检测如果当前是否在连续绘制图形模式下，如果发现当前有图形在绘制则替换绘制层，否则在当前堆栈中添加绘制层
             if (newItems.length > 0 && newItems[newItems.length - 1].status === "new") {
-                newItems[newItems.length - 2] = newItem;
-                newItems[newItems.length - 1] = drawLayerItem
+                let shape = Utils.getItemType(newItems[newItems.length - 2]);
+                if (shape === "SketchpadPolygon" || shape === "SketchpadCurvedLine") {
+                    newItems[newItems.length - 2].status = "done";
+                    newItems[newItems.length - 1] = newItem;
+                    newItems.push(drawLayerItem);
+                } else {
+                    newItems[newItems.length - 2] = newItem;
+                    newItems[newItems.length - 1] = drawLayerItem
+                }
             } else {
                 newItems.push(newItem);
                 newItems.push(drawLayerItem);
@@ -327,7 +334,7 @@ class Container extends Component {
         }
     }
     finalizeDrawing(needUpdateHistory) {
-        let items = this.state.items;
+        let items = JSON.parse(JSON.stringify(this.state.items));
         let that = this;
         let newItems = [];
         for (var i in items) {

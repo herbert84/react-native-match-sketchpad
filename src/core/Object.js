@@ -118,12 +118,13 @@ class SketchObject extends Component {
             currentX: this.state.x,
             currentY: this.state.y
         })*/
-        let shape = Utils.getItemType(this.props.data);
+        let data = this.props.data;
+        let shape = Utils.getItemType(data);
         if (shape === "SketchpadPolygon") {
             let deltaX = (this.state.x - this.minXPoint.x) / this.scaleFactor;
             let deltaY = (this.state.y - this.minYPoint.y) / this.scaleFactor;
 
-            let objectData = this.props.data;
+            let objectData = data;
             let newPoints = [];
             let pointsArray = [];
 
@@ -141,7 +142,7 @@ class SketchObject extends Component {
             this.props.data.y = this.state.y / this.scaleFactor;
         }
         let type = gestureState.dx === 0 ? "CLICK" : "MOVE";
-        this.props.attachObjectEvent({ selectedId: this.props.data.id, shape, item: this.props.data, eventType: type });
+        this.props.attachObjectEvent({ selectedId: data.id, shape, item: data, eventType: type });
     }
     getRectSize() {
         let { points } = this.props.data;

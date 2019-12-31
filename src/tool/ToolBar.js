@@ -62,7 +62,7 @@ class ToolBar extends Component {
             this.state.elementToolBarX,
             {
                 toValue: ScreenWidth - 32,
-                duration: 300,   //动画时长300毫秒,
+                duration: 200,   //动画时长300毫秒,
                 easing: Easing.linear
             }
         ).start();
@@ -74,7 +74,7 @@ class ToolBar extends Component {
             this.state.elementToolBarX,
             {
                 toValue: 94,
-                duration: 300,   //动画时长300毫秒,
+                duration: 200,   //动画时长300毫秒,
                 easing: Easing.linear
             }).start();
     }
@@ -84,7 +84,7 @@ class ToolBar extends Component {
             this.state.shapeToolBarX,
             {
                 toValue: -topMargin - Utils.getPhoneTopDistance(),
-                duration: 300,   //动画时长300毫秒,
+                duration: 200,   //动画时长300毫秒,
                 easing: Easing.linear
             }
         ).start();
@@ -96,7 +96,7 @@ class ToolBar extends Component {
             this.state.shapeToolBarX,
             {
                 toValue: ScreenHeight,
-                duration: 300,   //动画时长300毫秒,
+                duration: 200,   //动画时长300毫秒,
                 easing: Easing.linear
             }).start();
     }
