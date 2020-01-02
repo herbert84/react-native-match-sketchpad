@@ -46,7 +46,8 @@ class ToolBar extends Component {
             itemSelectedId: null,
             itemSelected: false,
             elementToolBarX: new Animated.Value(94),// 点击元素按钮后展开及收拢的长度/宽度变化值
-            shapeToolBarX: new Animated.Value(ScreenHeight) // 点击图形后向上/向左展开及收拢的高度/宽度变化值
+            shapeToolBarX: new Animated.Value(ScreenHeight), // 点击图形后向上/向左展开及收拢的高度/宽度变化值
+            selectedElementImage: ""  // 记录在工具条中选中的具体的物体(具体的线条，区域，球员或球场物体)，以便在继续绘制的时候高亮该物体
         }
     }
     componentWillReceiveProps(newProps) {
@@ -115,13 +116,17 @@ class ToolBar extends Component {
                 });
                 //this._showShapeTipView();
             } else {
+                let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image;
                 this.setState({
-                    showItemsModal: false
+                    showItemsModal: false,
+                    selectedElementImage: img
                 });
                 this._hiddenTipView();
                 //this._hiddenShapeTipView();
-                item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
-                item.backgroundColor = ColorMappings[this.state.selectedColorIndex].backgroundColor;  //设置选中的颜色
+                if (this.state.showItemsModalShape === "LINE" || this.state.showItemsModalShape === "AREAS") {
+                    item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
+                    item.backgroundColor = ColorMappings[this.state.selectedColorIndex].backgroundColor;  //设置选中的颜色
+                }
                 this.defauleColorIndex[this.state.showItemsModalShape] = this.state.selectedColorIndex;  // 记住本次绘制所选择的颜色
                 this.props.startDrawMode(item)
             }
@@ -184,7 +189,8 @@ class ToolBar extends Component {
         this.setState({
             expandElementItems: false,
             showElementItems: this.props.isPortrait ? ToolElementItemsPortrait : ToolElementItemsLandscape,
-            selectedColorIndex: this.defauleColorIndex[this.state.showItemsModalShape]
+            selectedColorIndex: this.defauleColorIndex[this.state.showItemsModalShape],
+            selectedElementImage: ""  // 结束绘制时清空上次绘制的选择
         });
         let needUpdateHistory = this.state.activeItem.shape === "SketchpadCurvedLine" || this.state.activeItem.shape === "SketchpadPolygon" ? true : false;
         this.props.onPressConfirmDrawing(needUpdateHistory);
@@ -202,14 +208,15 @@ class ToolBar extends Component {
         let key = this.state.showItemsModalShape;
         let imgWidth = bgImage.width / 2;
         let imgHeight = bgImage.height / 2;
+        let backgroundColor = img === this.state.selectedElementImage ? "#656866" : "#484848";   // 选中和未选择设置不同的背景色
         if (key === "AREAS") {
             let textStyle = this.props.isPortrait ? { position: "absolute", bottom: 12, color: "#FFF", fontSize: 12 } : { position: "absolute", right: 24, color: "#FFF", top: 27, fontSize: 12 }
-            return <View key={Utils.randomStringId(10)} style={{ backgroundColor: "#484848", marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight }}>
+            return <View key={Utils.randomStringId(10)} style={{ backgroundColor, marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight }}>
                 <Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} />
                 <Text style={textStyle} onPress={() => this.onPressElementItem(item)}>{Utils.getTranslatedText("LABEL", item.key, this.props.language)}</Text>
             </View>
         } else {
-            return <View key={Utils.randomStringId(10)} style={{ backgroundColor: "#484848", marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight }}><Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} /></View>
+            return <View key={Utils.randomStringId(10)} style={{ backgroundColor, marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight }}><Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} /></View>
         }
     }
     /**
