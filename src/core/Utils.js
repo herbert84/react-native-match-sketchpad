@@ -130,11 +130,12 @@ const Utils = {
      */
     dataScale(item, scaleType) {
         let classNameArray = item.className.split(".");
-        let type = classNameArray[classNameArray.length - 1];
-        let scale = this.getScaleNum(type, item.image);
+        let shape = classNameArray[classNameArray.length - 1];
+        let scale = this.getScaleNum(shape, item.image);
         return (scaleType === "reduce") ? item.scale / scale : item.scale * scale;
     },
     getScaleNum(shape, type) {
+        let imageArray = type ? type.split("/") : [];
         let regPlayer = /^(red|blue|yellow|green)[1-6].png$/;
         switch (shape) {
             case "SketchpadText": scale = Math.pow(1.1, 5); break;
@@ -143,7 +144,7 @@ const Utils = {
                     scale = Math.pow(1.1, 15);
                 } else if (type.indexOf("coordination_ladder") > -1 || type.indexOf("goal") > -1 || type.indexOf("gymnastics_box") > -1) {
                     scale = 1;
-                } else if (regPlayer.test(type)) {
+                } else if (regPlayer.test(imageArray[imageArray.length - 1])) {
                     scale = Math.pow(1.1, 5);
                 } else {
                     scale = Math.pow(1.1, 10);
@@ -154,6 +155,7 @@ const Utils = {
         return scale;
     },
     getDefaultScaleValue(shape, type) {
+        let imageArray = type ? type.split("/") : [];
         let regPlayer = /^(red|blue|yellow|green)[1-6].png$/;
         let defaultValue = 1;
         if (shape === "SketchpadShape") {
@@ -167,7 +169,7 @@ const Utils = {
                 defaultValue = 0.2;
             } else if (type.indexOf("coordination_ladder2.png") > -1 || type.indexOf("opponent") > -1) {
                 defaultValue = 0.25;
-            } else if (regPlayer.test(type)) {
+            } else if (regPlayer.test(imageArray[imageArray.length - 1])) {
                 defaultValue = 0.3;
             } else {
                 defaultValue = 0.15;
