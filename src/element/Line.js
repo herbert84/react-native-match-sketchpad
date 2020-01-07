@@ -54,8 +54,11 @@ class Line extends SketchObject {
         if (this.props.data.style && this.props.data.style.length === 1) {
             this.strokeDasharray = [this.props.data.style[0], this.props.data.style[0]];
         } else {
-            if (Platform.OS === "ios")
-                this.strokeDasharray = []
+            if (Platform.OS === "ios") {
+                this.strokeDasharray = [];
+            } else {
+                this.strokeDasharray = [0, 0]
+            }
         }
     }
     /**

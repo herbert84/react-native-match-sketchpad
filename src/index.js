@@ -35,6 +35,7 @@ class Sketchpad extends Component {
         return (<View>
             <Container
                 data={this.props.data}
+                history={this.props.history}
                 fullMode={this.props.fullMode}
                 isEditable={this.props.isEditable}
                 width={this.props.width}

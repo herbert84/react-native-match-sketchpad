@@ -112,7 +112,8 @@ class ToolBar extends Component {
                     showItemsModalShape: item.key,
                     showItemsModalIcon: item.image,
                     activeItem: item,
-                    showShapeItems: item.nodes
+                    showShapeItems: item.nodes,
+                    selectedColorIndex: this.defauleColorIndex[item.key]   // 设置选择颜色
                 });
                 //this._showShapeTipView();
             } else {
@@ -151,9 +152,47 @@ class ToolBar extends Component {
         let dynamicWH = item.key === "ELEMENT" ? 94 : parseInt((ScreenWidth - 32 - 94) / 5);
         let width = this.props.isPortrait ? dynamicWH : 36;
         let height = this.props.isPortrait ? 36 : dynamicWH;
-        let title = Utils.getTranslatedText("LABEL", item.key, this.props.language)
+        let title = Utils.getTranslatedText("LABEL", item.key, this.props.language);
+        let showSeparator = item.key === "ELEMENT" && this.state.expandElementItems ? true : false;
 
-        return <View style={{ width, height, alignItems: "center", justifyContent: "center" }}><Button isPortrait={this.props.isPortrait} imageSource={AppImageList[img]} onPress={() => this.onPressElementItem(item)} label={item.showTitle ? title : null} language={this.props.language} /></View>
+        return showSeparator ?
+            (
+                <View style={{ width, height, alignItems: "center", flexDirection: this.props.isPortrait ? "row" : "column", justifyContent: "space-between" }}>
+                    <View style={{ width, height, alignItems: "center", justifyContent: "center" }}>
+                        <Button
+                            isPortrait={this.props.isPortrait}
+                            imageSource={AppImageList[img]}
+                            onPress={() => this.onPressElementItem(item)}
+                            label={item.showTitle ? title : null}
+                            language={this.props.language} />
+                    </View >
+                    {this.renderElementButtonSeparator()}
+                </View>
+            )
+            :
+            (
+                <View style={{ width, height, alignItems: "center", justifyContent: "center" }}>
+                    <Button
+                        isPortrait={this.props.isPortrait}
+                        imageSource={AppImageList[img]}
+                        onPress={() => this.onPressElementItem(item)}
+                        label={item.showTitle ? title : null}
+                        language={this.props.language} />
+                </View >
+            );
+    }
+    /**
+     * 渲染元素按钮中间的分割线
+     *
+     * @returns
+     * @memberof ToolBar
+     */
+    renderElementButtonSeparator() {
+        let width = this.props.isPortrait ? 1 : 12;
+        let height = this.props.isPortrait ? 12 : 1;
+        return (
+            <View style={{ width, height, backgroundColor: "#353535" }}></View>
+        );
     }
     /**
      * 点击返回按钮的响应函数
@@ -211,12 +250,12 @@ class ToolBar extends Component {
         let backgroundColor = img === this.state.selectedElementImage ? "#656866" : "#484848";   // 选中和未选择设置不同的背景色
         if (key === "AREAS") {
             let textStyle = this.props.isPortrait ? { position: "absolute", bottom: 12, color: "#FFF", fontSize: 12 } : { position: "absolute", right: 24, color: "#FFF", top: 27, fontSize: 12 }
-            return <View key={Utils.randomStringId(10)} style={{ backgroundColor, marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight }}>
+            return <View key={Utils.randomStringId(10)} style={{ backgroundColor, marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight, borderRadius: 2 }}>
                 <Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} />
                 <Text style={textStyle} onPress={() => this.onPressElementItem(item)}>{Utils.getTranslatedText("LABEL", item.key, this.props.language)}</Text>
             </View>
         } else {
-            return <View key={Utils.randomStringId(10)} style={{ backgroundColor, marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight }}><Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} /></View>
+            return <View key={Utils.randomStringId(10)} style={{ backgroundColor, marginRight: 8, marginBottom: 8, alignItems: "center", width: imgWidth, height: imgHeight, borderRadius: 2 }}><Button imageSource={AppImageList[img]} width={imgWidth} height={imgHeight} onPress={() => this.onPressElementItem(item)} /></View>
         }
     }
     /**
@@ -383,6 +422,7 @@ class ToolBar extends Component {
             return (<View style={styles.containerEditReadInPortrait}>
                 <Animated.View style={[styles.elementContainer, { marginRight: btnElementMarginRightBottom, width: this.state.elementToolBarX, height: 36, flexDirection: "row", alignItems: "center", justifyContent: "center" }]}>
                     <Button onPress={() => this.onPressElementItem(this.state.activeItem)} imageSource={AppImageList[this.state.showItemsModalIcon]} />
+                    {this.renderElementButtonSeparator()}
                     <Button onPress={() => this.finalizeDrawing()} imageSource={AppImageList.endDrawing} />
                 </Animated.View>
                 <View style={styles.essentialBtnContainerInPortrait}>
@@ -423,8 +463,9 @@ class ToolBar extends Component {
         }
         else if (this.props.action === "drawing") {
             return (<View style={styles.containerEditReadInLandscape}>
-                <Animated.View style={[styles.elementContainer, { marginBottom: btnElementMarginRightBottom, height: this.state.elementToolBarX }]}>
+                <Animated.View style={[styles.elementContainer, { marginBottom: btnElementMarginRightBottom, height: this.state.elementToolBarX, alignItems: "center", justifyContent: "center" }]}>
                     <Button onPress={() => this.onPressElementItem(this.state.activeItem)} imageSource={AppImageList[this.state.showItemsModalIcon]} />
+                    {this.renderElementButtonSeparator()}
                     <Button onPress={() => this.finalizeDrawing()} imageSource={AppImageList.endDrawing} />
                 </Animated.View>
                 <View style={styles.essentialBtnContainerInLandscape}>

@@ -40,8 +40,12 @@ class Container extends Component {
         //let convertedItems = this.dataModel.items;
         //Global.instanceId = Utils.randomStringId(10);
         //this.instanceId = Global.instanceId;
-        this.history = new History();
-        this.history.setInitialData(JSON.parse(JSON.stringify(convertedItems)));
+        if (props.history) {
+            this.history = props.history;
+        } else {
+            this.history = new History();
+            this.history.setInitialData(JSON.parse(JSON.stringify(convertedItems)));
+        }
         this.state = {
             items: JSON.parse(JSON.stringify(convertedItems)),
             isFull: props.fullMode,
@@ -169,21 +173,30 @@ class Container extends Component {
      * @description 切换视图模式，全屏/缩略图。为了解决安卓下横竖屏切换会造成弹出蒙层无法点击的bug。因此将机制改为先横屏，然后在更新蒙层及画布内容。
      * @memberof Container
      */
-    switchSizeMode() {
-        if (!this.state.isFull && this.needRotate) {
-            (Platform.OS === "android") ? Orientation.lockToLandscapeLeft() : Orientation.lockToLandscapeRight()
+    switchSizeMode(mode) {
+        if (mode === "full") {
+            if (this.needRotate) {
+                (Platform.OS === "android") ? Orientation.lockToLandscapeLeft() : Orientation.lockToLandscapeRight()
+            } else {
+                Orientation.lockToPortrait();
+            }
+            this.setState({
+                isFull: true,
+                isEdit: this.props.isEditable ? true : false,
+                isPortrait: this.needRotate ? false : true
+            });
         } else {
             Orientation.lockToPortrait();
-        }
-        this.setState({
-            isFull: !this.state.isFull,
-            isEdit: (this.props.isEditable && !this.state.isFull) ? true : false,
-            isPortrait: this.needRotate ? false : true
-        });
-        this.finalizeDrawing(true);
-        // 如果当前处于全屏模式
-        if (this.state.isFull) {
+            this.setState({
+                isFull: false,
+                isEdit: false,
+                isPortrait: this.needRotate ? false : true
+            });
+            this.finalizeDrawing(true);
+            // 如果当前处于全屏模式
+            //if (this.state.isFull) {
             this.onExitFullMode();
+            //}
         }
     }
     /**
@@ -197,7 +210,7 @@ class Container extends Component {
             let items = Utils.recalculateItems(this.state.items, 0 - this.offsetX, "reduce");
             let newData = JSON.parse(JSON.stringify(this.dataModel));
             newData.items = items;
-            this.props.onExitFullMode && this.props.onExitFullMode(JSON.stringify(newData));
+            this.props.onExitFullMode && this.props.onExitFullMode(JSON.stringify(newData), this.history);
         }
     }
     /**
@@ -284,6 +297,8 @@ class Container extends Component {
         let height = (this.needRotate) ? ScreenWidth / scale.toString() : (1960 / 1251 * ScreenWidth / scale).toString();
         let newItem = DataModal.addObject(item);
         let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
+        this.drawLayerItem = drawLayerItem;
+        this.newItem = newItem;
         newItems.push(newItem);
         newItems.push(drawLayerItem);
         this.setState({
@@ -310,7 +325,9 @@ class Container extends Component {
             this.currentSketchpadTextItem = newItem;
         } else {
             let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
-            //检测如果当前是否在连续绘制图形模式下，如果发现当前有图形在绘制则替换绘制层，否则在当前堆栈中添加绘制层
+            this.drawLayerItem = drawLayerItem;
+            this.newItem = newItem;
+            //检测如果当前是否在连续绘制图形模式下，如果发现当前有图形在绘制则替换 绘制层，否则在当前堆栈中添加绘制层
             if (newItems.length > 0 && newItems[newItems.length - 1].status === "new") {
                 let shape = Utils.getItemType(newItems[newItems.length - 2]);
                 if (shape === "SketchpadPolygon" || shape === "SketchpadCurvedLine") {
@@ -362,20 +379,32 @@ class Container extends Component {
     removeHistory() {
         //this.history.backToInitialData();
         this.history.addOperationData([], "remove");
-        let newItems = this.history.getAll();
+        let historyOperations = this.history.getAll();
+        // SSCAE-3165: 清空画布时，需要继续保持当前的绘制状态，使用户能够继续绘制
+        let newItems = JSON.parse(JSON.stringify(historyOperations[historyOperations.length - 1].data));
+        if (this.state.action === "drawing" && this.drawLayerItem && this.newItem) {
+            newItems.push(this.newItem);
+            newItems.push(this.drawLayerItem);
+        }
         this.setState({
-            items: JSON.parse(JSON.stringify(newItems[newItems.length - 1].data)),
-            action: "read",
+            items: newItems,
+            // action: "read",
             hasHistoryOperation: true
         });
     }
     undoLastOperation() {
         this.history.undoLastOperation();
-        let newItems = this.history.getAll();
-        let hasHistoryOperation = newItems.length - 1 > 0 ? true : false;
+        let historyOperations = this.history.getAll();
+        let hasHistoryOperation = historyOperations.length - 1 > 0 ? true : false;
+        // SSCAE-3165: 取消上一步操作时，需要继续保持当前的绘制状态，使用户能够继续绘制
+        let newItems = JSON.parse(JSON.stringify(historyOperations[historyOperations.length - 1].data));
+        if (this.state.action === "drawing" && this.drawLayerItem && this.newItem) {
+            newItems.push(this.newItem);
+            newItems.push(this.drawLayerItem);
+        }
         this.setState({
-            items: JSON.parse(JSON.stringify(newItems[newItems.length - 1].data)),
-            action: "read",
+            items: newItems,
+            // action: "read",
             hasHistoryOperation
         });
     }
@@ -488,7 +517,7 @@ class Container extends Component {
                     undoLastOperation={() => this.undoLastOperation()} //返回上一次操作
                     startDrawMode={(item) => this.startDrawMode(item)} //开始画图
                     onPressTool={(newItems, type) => this.onPressToolBtn(newItems, type)} //选中物体后点击操作按钮的回调函数
-                    onPressSwitchSize={() => this.switchSizeMode()} //切换屏幕全屏至缩略图
+                    onPressSwitchSize={() => this.switchSizeMode("small")} //切换屏幕全屏至缩略图
                     onPressConfirmDrawing={(needUpdateHistory) => this.finalizeDrawing(needUpdateHistory)} //结束当前类型画图
                 />
             </View>
@@ -541,7 +570,7 @@ class Container extends Component {
                 bg={this.dataModel.background}
                 items={this.state.items}
                 isEdit={this.state.isEdit} />
-            <TouchableOpacity onPress={() => this.switchSizeMode()} style={{ position: "absolute", top: 0, bottom: 0, width: canvasWidth, height: canvasHeight }}></TouchableOpacity>
+            <TouchableOpacity onPress={() => this.switchSizeMode("full")} style={{ position: "absolute", top: 0, bottom: 0, width: canvasWidth, height: canvasHeight }}></TouchableOpacity>
             <Modal isVisible={this.state.isFull} supportedOrientations={['portrait', 'landscape']} style={{ backgroundColor: "#000", margin: 0 }} animationIn="fadeIn" animationOut="fadeOut">
                 {this.renderStatusBar()}
                 {this.renderCanvasContent(fullScreenBgWidth, sketchpadHeight)}

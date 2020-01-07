@@ -157,9 +157,18 @@ class StraightLine extends Line {
         result.push(...this.drawArrows(this.minXPoint.x, this.minYPoint.y));
         // draw line
         switch (this.props.data.type) {
-            case "sinus": result.push(this.drawSinusLine(x1, y1, x2, y2, true)); result.push(this.drawSinusLine(x1, y1, x2, y2)); break;
-            case "double": result.push(this.drawDoubleLine(x1, y1, x2, y2, true)); result.push(this.drawDoubleLine(x1, y1, x2, y2)); break;
-            default: result.push(this.drawSimpleLine(x1, y1, x2, y2, true)); result.push(this.drawSimpleLine(x1, y1, x2, y2)); break;
+            case "sinus":
+                this.isEdit && result.push(this.drawSinusLine(x1, y1, x2, y2, true));  // SSCAE-3239: 编辑态时才需要渲染选择区域
+                result.push(this.drawSinusLine(x1, y1, x2, y2));
+                break;
+            case "double":
+                this.isEdit && result.push(this.drawDoubleLine(x1, y1, x2, y2, true));  // SSCAE-3239: 编辑态时才需要渲染选择区域
+                result.push(this.drawDoubleLine(x1, y1, x2, y2));
+                break;
+            default:
+                this.isEdit && result.push(this.drawSimpleLine(x1, y1, x2, y2, true));  // SSCAE-3239: 编辑态时才需要渲染选择区域
+                result.push(this.drawSimpleLine(x1, y1, x2, y2));
+                break;
         }
         return this.lineContainer(result);
     }
