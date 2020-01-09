@@ -1,4 +1,4 @@
-import { Platform, Dimensions } from "react-native";
+import { Platform, Dimensions, StatusBar } from "react-native";
 import * as _ from "lodash";
 import { zh } from "../i18n/zh";
 import { en } from "../i18n/en";
@@ -38,7 +38,7 @@ const Utils = {
         if (needRotate) {
             return (isIphoneX) ? 44 : 0
         } else {
-            return (isIphoneX) ? 44 : (Platform.OS === "android") ? 0 : 20
+            return (isIphoneX) ? 44 : (Platform.OS === "android") ? StatusBar.currentHeight : 20
         }
     },
     getPhoneTopDistance() {
@@ -213,7 +213,9 @@ const Utils = {
                 newItem.width = Math.round(newItem.width);
                 newItem.height = Math.round(newItem.height);
             }
-            newItems.push(newItem)
+            if (items[i].status !== "new" && items[i].status !== "drawing") {
+                newItems.push(newItem);
+            }
         }
         return newItems;
     }

@@ -5,7 +5,7 @@ import { StyleSheet, AppRegistry, DeviceEventEmitter, View, Animated, Dimensions
 const { width, height } = Dimensions.get('window')
 
 let keyValue = 0;
-const rnmsLoadingKey = 'rnms-loading-key'
+const rnmsLoadingKey = 'rnms-loading-key';
 
 export default class RNMatchSketchpadTopView extends Component {
     static addContent(element) {
@@ -37,11 +37,13 @@ export default class RNMatchSketchpadTopView extends Component {
     componentWillMount() {
         DeviceEventEmitter.addListener("addOverlay-Content", e => this.addContentToTopView(e));
         DeviceEventEmitter.addListener("removeOverlay-Content", (e) => this.removeContentFromTopView(e));
+        DeviceEventEmitter.addListener("removeAllOverlay-Content", e => this.removeAll(e));
     }
 
     componentWillUnmount() {
         DeviceEventEmitter.removeAllListeners("addOverlay-Content");
         DeviceEventEmitter.removeAllListeners("removeOverlay-Content");
+        DeviceEventEmitter.removeAllListeners("removeAllOverlay-Content");
     }
 
     removeContentFromTopView(e) {
@@ -62,8 +64,8 @@ export default class RNMatchSketchpadTopView extends Component {
     }
 
     removeAll(e) {
-        let { elements } = this.state;
-        this.setState({ elements: [] });
+        let { contentElements, elements } = this.state;
+        this.setState({ contentElements: [], elements: [] });
     }
 
     transform(e) {
@@ -153,15 +155,15 @@ export default class RNMatchSketchpadTopView extends Component {
                             {
                                 contentElements.map((item, index) => {
                                     // 同一时刻只加载elements中最后一个element
-                                    if (index == contentElements.length - 1) {
-                                        return (
-                                            <View key={'RRCTopView_Content' + item.key} style={styles.overlay} pointerEvents={'box-none'} >
-                                                {item.element}
-                                            </View>
-                                        );
-                                    } else {
-                                        return null;
-                                    }
+                                    //if (index == contentElements.length - 1) {
+                                    return (
+                                        <View key={'RRCTopView_Content' + item.key} style={styles.overlay} pointerEvents={'box-none'} >
+                                            {item.element}
+                                        </View>
+                                    );
+                                    //} else {
+                                    //    return null;
+                                    //}
                                 })
                             }
                         </View>

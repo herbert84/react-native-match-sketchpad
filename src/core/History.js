@@ -29,6 +29,14 @@ class History {
     removeAll() {
         this.history = []
     }
-
+    /**
+     * 判断是否存在操作历史
+     *
+     * @returns
+     * @memberof History
+     */
+    hasHistoryOperation() {
+        return this.history.length > 1 ? true : false;
+    }
 }
 export default History;

@@ -157,7 +157,7 @@ class ToolBar extends Component {
 
         return showSeparator ?
             (
-                <View style={{ width, height, alignItems: "center", flexDirection: this.props.isPortrait ? "row" : "column", justifyContent: "space-between" }}>
+                <View style={{ width, height, alignItems: "center", flexDirection: this.props.isPortrait ? "row" : "column", justifyContent: "center" }}>
                     <View style={{ width, height, alignItems: "center", justifyContent: "center" }}>
                         <Button
                             isPortrait={this.props.isPortrait}
@@ -432,9 +432,15 @@ class ToolBar extends Component {
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} /></View>
             </View>)
         } else {
-            return (<View style={[styles.containerEditReadInPortrait, { width: 126 }]}>
-                <Button style={{ marginRight: 22 }} onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
-                <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} /></View>)
+            // 只读状态时退出全屏和下载按钮需要居于右侧
+            return (
+                <View style={{ flexDirection: "row", width: "100%", justifyContent: "flex-end" }}>
+                    <View style={[styles.containerEditReadInPortrait, { width: 126 }]}>
+                        <Button style={{ marginRight: 22 }} onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
+                        <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
+                    </View>
+                </View>
+            );
         }
     }
     showToolbarInLandscapeMode() {
@@ -476,9 +482,15 @@ class ToolBar extends Component {
                 </View>
             </View >)
         } else {
-            return (<View style={[styles.containerEditReadInLandscape, { height: 126 }]}>
-                <Button style={{ marginBottom: 22 }} onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
-                <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} /></View>)
+            // 只读状态时退出全屏和下载按钮需要居于下方
+            return (
+                <View style={{ flexDirection: "column", justifyContent: "flex-end", height: "100%" }}>
+                    <View style={[styles.containerEditReadInLandscape, { height: 126 }]}>
+                        <Button style={{ marginBottom: 22 }} onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
+                        <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
+                    </View>
+                </View>
+            );
         }
     }
     renderElementLayer(mode) {

@@ -1,10 +1,12 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+let ScreenWidth = Dimensions.get("window").width;
 const styles = StyleSheet.create({
     containerEditReadInPortrait: {
         flexDirection: "row",
         paddingTop: 12.5,
         paddingLeft: 16,
         paddingRight: 16,
+        width: ScreenWidth,
         justifyContent: "space-between"
     },
     containerEditReadInLandscape: {
