@@ -25,6 +25,7 @@ class Line extends SketchObject {
         }*/
     }
     componentWillReceiveProps(nextProps) {
+        super.componentWillReceiveProps(nextProps);
         if (nextProps.selectedId === this.props.data.id) {
             console.log("found and selected")
             this.setState({

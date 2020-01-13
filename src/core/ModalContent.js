@@ -25,7 +25,8 @@ export default class ModalContent extends Component {
             itemSelected: false,
             selectedObjectShape: null,
             isPortrait: true,
-            itemSelectedId: null
+            itemSelectedId: null,
+            hasHistoryOperation: props.history.hasHistoryOperation()
         }
     }
     /**
@@ -203,7 +204,7 @@ export default class ModalContent extends Component {
         this.setState({
             items: newItems,
             action: "read",
-            hasHistoryOperation: true
+            hasHistoryOperation: needUpdateHistory || this.state.hasHistoryOperation  // 当需要添加历史操作时，设置该属性为true，否则保持其原来的值
         }, () => {
             if (needUpdateHistory)
                 that.props.history.addOperationData(JSON.parse(JSON.stringify(newItems)), "add");

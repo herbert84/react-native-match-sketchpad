@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList, Text, ScrollView, Dimensions, Image, Animated, Easing, TouchableOpacity } from "react-native";
+import { View, FlatList, Text, ScrollView, Dimensions, Image, Animated, Easing, TouchableOpacity, Platform } from "react-native";
 import * as _ from "lodash";
 import Utils from "../core/Utils";
 import Button from "../component/Button";
@@ -120,7 +120,8 @@ class ToolBar extends Component {
                 let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image;
                 this.setState({
                     showItemsModal: false,
-                    selectedElementImage: img
+                    selectedElementImage: img,
+                    activeItem: item
                 });
                 this._hiddenTipView();
                 //this._hiddenShapeTipView();
@@ -282,7 +283,7 @@ class ToolBar extends Component {
             //竖屏模式下，如果是线条，则显示四行，如果是区域则显示一行，否则显示两行
             let contentHeight = this.state.showItemsModalShape === "LINE" ? 296 : 187;
             let numColumns = (this.state.showItemsModalShape === "LINE") ? Math.ceil(this.state.showShapeItems.length / 4) : this.state.showItemsModalShape === "AREAS" ? 3 : Math.ceil(this.state.showShapeItems.length / 2);
-            return (<View style={{ position: "absolute", bottom: 0, height: contentHeight, width: "100%", backgroundColor: "rgba(0,0,0,0.9)" }}>
+            return (<View style={{ position: "absolute", bottom: 0, height: contentHeight + (Platform.OS === "android" ? 20 : 0), width: "100%", backgroundColor: "rgba(0,0,0,0.9)" }}>
                 {this.renderShapeSelectModalToolBar()}
                 {this.renderColorSelectionList()}
                 <ScrollView style={{ flexDirection: "row", paddingLeft: 16, paddingRight: 8 }} horizontal={true}>

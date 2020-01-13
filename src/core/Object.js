@@ -41,6 +41,8 @@ class SketchObject extends Component {
         let shape = Utils.getItemType(this.props.data);
         switch (shape) {
             case "SketchpadPolygon":
+            case "SketchpadStraightLine":
+            case "SketchpadCurvedLine":
                 let { points } = this.props.data;
                 if (points.length >= 4) {
                     let pointsArray = [];
@@ -120,7 +122,7 @@ class SketchObject extends Component {
         })*/
         let data = this.props.data;
         let shape = Utils.getItemType(data);
-        if (shape === "SketchpadPolygon") {
+        if (shape === "SketchpadPolygon" || shape === "SketchpadStraightLine" || shape === "SketchpadCurvedLine") {
             let deltaX = (this.state.x - this.minXPoint.x) / this.scaleFactor;
             let deltaY = (this.state.y - this.minYPoint.y) / this.scaleFactor;
 

@@ -176,7 +176,7 @@ export default class RNMatchSketchpadTopView extends Component {
 
 var styles = StyleSheet.create({
     overlayContainer: {
-        backgroundColor: 'rgba(0, 0, 0, 0)',
+        backgroundColor: 'rgba(0, 0, 0, 1)',
         position: 'absolute',
         top: 0,
         left: 0,
