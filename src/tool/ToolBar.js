@@ -120,8 +120,7 @@ class ToolBar extends Component {
                 let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image;
                 this.setState({
                     showItemsModal: false,
-                    selectedElementImage: img,
-                    activeItem: item
+                    selectedElementImage: img
                 });
                 this._hiddenTipView();
                 //this._hiddenShapeTipView();
