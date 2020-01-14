@@ -40,6 +40,7 @@ class ToolBar extends Component {
             showItemsModalShape: "", //元素蒙层形状
             showItemsModalIcon: "", //元素蒙层图标
             activeItem: null, //当前被激活的元素,
+            drawingItem: null,  //当前正在绘制的图形
             selectedColorIndex: COLOR_BLACK_INDEX,  //选中的颜色的索引位置，默认选中黑色
             itemSelectedIsTop: false,
             itemSelectedIsBottom: false,
@@ -101,6 +102,14 @@ class ToolBar extends Component {
                 easing: Easing.linear
             }).start();
     }
+    /**
+     * 判断是否有可被删除的物体
+     *
+     * @memberof ToolBar
+     */
+    _hasRemovableItems(items) {
+        return _.filter(items, (item) => { return (item.status !== "new" && item.status !== "drawing") ? true : false; }).length > 0 ? true : false;
+    }
     _keyExtractor = (item, index) => Utils.randomStringId(10);
     onPressElementItem(item) {
         if (item.key !== "ELEMENT") {
@@ -120,7 +129,8 @@ class ToolBar extends Component {
                 let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image;
                 this.setState({
                     showItemsModal: false,
-                    selectedElementImage: img
+                    selectedElementImage: img,
+                    drawingItem: item
                 });
                 this._hiddenTipView();
                 //this._hiddenShapeTipView();
@@ -231,7 +241,8 @@ class ToolBar extends Component {
             selectedColorIndex: this.defauleColorIndex[this.state.showItemsModalShape],
             selectedElementImage: ""  // 结束绘制时清空上次绘制的选择
         });
-        let needUpdateHistory = this.state.activeItem.shape === "SketchpadCurvedLine" || this.state.activeItem.shape === "SketchpadPolygon" ? true : false;
+        // 当绘制连续打点的图形时，点击结束绘制需要添加历史
+        let needUpdateHistory = this.state.drawingItem.shape === "SketchpadCurvedLine" || this.state.drawingItem.shape === "SketchpadPolygon" ? true : false;
         this.props.onPressConfirmDrawing(needUpdateHistory);
     }
     /**
@@ -411,7 +422,7 @@ class ToolBar extends Component {
                     />
                 </Animated.View>
                 <View style={styles.essentialBtnContainerInPortrait}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={this.props.items.length === 0 ? true : false} language={this.props.language} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this._hasRemovableItems(this.props.items)} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
                     <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
@@ -426,7 +437,7 @@ class ToolBar extends Component {
                     <Button onPress={() => this.finalizeDrawing()} imageSource={AppImageList.endDrawing} />
                 </Animated.View>
                 <View style={styles.essentialBtnContainerInPortrait}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={this.props.items.length === 0 ? true : false} language={this.props.language} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this._hasRemovableItems(this.props.items)} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
                     <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} /></View>
@@ -461,7 +472,7 @@ class ToolBar extends Component {
                     />
                 </Animated.View>
                 <View style={styles.essentialBtnContainerInLandscape}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={this.props.items.length === 0 ? true : false} language={this.props.language} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this._hasRemovableItems(this.props.items)} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
                     <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />
@@ -475,7 +486,7 @@ class ToolBar extends Component {
                     <Button onPress={() => this.finalizeDrawing()} imageSource={AppImageList.endDrawing} />
                 </Animated.View>
                 <View style={styles.essentialBtnContainerInLandscape}>
-                    <Remove onPress={() => this.props.removeHistory()} isDisabled={this.props.items.length === 0 ? true : false} language={this.props.language} />
+                    <Remove onPress={() => this.props.removeHistory()} isDisabled={!this._hasRemovableItems(this.props.items)} language={this.props.language} />
                     <Undo onPress={() => this.props.undoLastOperation()} isDisabled={!this.props.hasHistory} />
                     <Button onPress={() => this.props.exportToImage()} imageSource={AppImageList.download} />
                     <Button onPress={() => this.switchSizeMode()} imageSource={AppImageList.minimize} />

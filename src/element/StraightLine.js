@@ -44,7 +44,7 @@ class StraightLine extends Line {
      * @param {*} ye 终点y坐标
      * @memberof Line
      */
-    drawSinusLine(xs, ys, xe, ye, isTouchArea) {
+    drawSinusLine(xs, ys, xe, ye, isSelected = false) {
         let pathData = "";
         let phi = Math.atan2(ye - ys, xe - xs);
         let length = this.lineLength(xe, ye, xs, ys);
@@ -72,8 +72,11 @@ class StraightLine extends Line {
         //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
         let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
         this.drawDash();
-        if (isTouchArea) {
-            return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
+        if (isSelected) {
+            let group = [];
+            group.push(<Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" />);
+            group.push(<Path d={pathData} stroke="transparent" strokeWidth="20" fill="none" onPress={() => this.objectOnPress()} />);
+            return group;
         } else {
             return <Path d={pathData} stroke={this.props.data.color} strokeDasharray={this.strokeDasharray} strokeWidth={this.props.data.lineWidth} fill="none" />;
         }
@@ -88,7 +91,7 @@ class StraightLine extends Line {
      * @param {*} strokeDasharray 虚线样式
      * @memberof Line
      */
-    drawSimpleLine(xs, ys, xe, ye, isTouchArea) {
+    drawSimpleLine(xs, ys, xe, ye, isTouchArea = false) {
         let pathData = "";
         // draw the line
         pathData += `M${xs} ${ys} `;
@@ -98,7 +101,10 @@ class StraightLine extends Line {
         let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
         this.drawDash();
         if (isTouchArea) {
-            return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
+            let group = [];
+            group.push(<Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" />);
+            group.push(<Path d={pathData} stroke="transparent" strokeWidth="20" fill="none" onPress={() => this.objectOnPress()} />);
+            return group;
         } else {
             return <Path d={pathData} stroke={this.props.data.color} strokeDasharray={this.strokeDasharray} strokeWidth={this.props.data.lineWidth} fill="none" />;
         }
@@ -113,7 +119,7 @@ class StraightLine extends Line {
      * @param {*} strokeDasharray 虚线样式
      * @memberof Line
      */
-    drawDoubleLine(xs, ys, xe, ye, isTouchArea) {
+    drawDoubleLine(xs, ys, xe, ye, isSelected) {
         let pathData = "";
         let phi = Math.atan2(ye - ys, xe - xs) + Math.PI / 2;
         let offset = 12 * this.scaleFactor;
@@ -138,8 +144,11 @@ class StraightLine extends Line {
         let touchAreaColor = this.state.isSelected ? this.props.selectedLineColor : this.props.touchAreaBackgroundColor;
         //let width = this.state.isSelected ? this.props.data.lineWidth * 2 : this.props.data.lineWidth;
         this.drawDash();
-        if (isTouchArea) {
-            return <Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" onPress={() => this.objectOnPress()} />;
+        if (isSelected) {
+            let group = [];
+            group.push(<Path d={pathData} stroke={touchAreaColor} strokeWidth={this.props.data.lineWidth * 5} fill="none" />);
+            group.push(<Path d={pathData} stroke="transparent" strokeWidth="20" fill="none" onPress={() => this.objectOnPress()} />);
+            return group;
         } else {
             return <Path d={pathData} stroke={this.props.data.color} strokeDasharray={this.strokeDasharray} strokeWidth={this.props.data.lineWidth} fill="none" />;
         }
@@ -162,7 +171,7 @@ class StraightLine extends Line {
                 result.push(this.drawSinusLine(x1, y1, x2, y2));
                 break;
             case "double":
-                this.isEdit && result.push(this.drawDoubleLine(x1, y1, x2, y2, true));  // SSCAE-3239: 编辑态时才需要渲染选择区域
+                this.isEdit && this.isEdit && result.push(this.drawDoubleLine(x1, y1, x2, y2, true));  // SSCAE-3239: 编辑态时才需要渲染选择区域
                 result.push(this.drawDoubleLine(x1, y1, x2, y2));
                 break;
             default:
