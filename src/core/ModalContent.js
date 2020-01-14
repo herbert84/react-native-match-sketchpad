@@ -364,6 +364,7 @@ export default class ModalContent extends Component {
      */
     onTextItemLayout(item, size) {
         // 判断是否为新添加的文本
+        let that = this;
         if (item.status === "drawing") {
             this.state.items.forEach(element => {
                 if (element.id === item.id) {
@@ -372,7 +373,10 @@ export default class ModalContent extends Component {
                 }
             });
             this.setState({
-                items: this.state.items
+                items: this.state.items,
+                hasHistoryOperation: true
+            }, () => {
+                that.props.history.addOperationData(JSON.parse(JSON.stringify(this.state.items)), "add");
             });
         }
     }

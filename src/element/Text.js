@@ -23,7 +23,8 @@ class SketchText extends SketchObject {
     };
     constructor(props) {
         super(props);
-
+        //scaleFactor是在prototype上面的，会被另外的草图所改变，所以现在构造函数里面将它copy到当前实例的一个属性上面
+        this.textScaleFactor = this.scaleFactor;
         this.state = {
             x: props.data.x * this.scaleFactor,
             y: props.data.y * this.scaleFactor,
@@ -35,27 +36,27 @@ class SketchText extends SketchObject {
             touchAreaHeight: 0,
             lastClickTime: 0
         };
-        this.initText();
+        this.initText(props);
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.selectedId === this.props.data.id) {
             console.log("found and selected")
-            this.initText()
+            this.initText(nextProps)
             this.addDraggableResponder()
         } else {
-            this.initText()
+            this.initText(nextProps)
         }
     }
     getSizeByHeight() {
-        return 20 * this.scaleFactor * this.props.data.scale;
+        return 20 * this.textScaleFactor * this.props.data.scale;
     }
-    initText() {
+    initText(props) {
         this.setState({
-            x: this.props.data.x * this.scaleFactor,
-            y: this.props.data.y * this.scaleFactor,
-            rotation: this.props.data.rotation
+            x: props.data.x * this.scaleFactor,
+            y: props.data.y * this.scaleFactor,
+            rotation: props.data.rotation
         });
-        this.measureTextSize(this.props.data);
+        this.measureTextSize(props.data);
     }
     /**
      * 点击文本的响应函数，第一阶段先不处理双击事件
