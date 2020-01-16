@@ -22,7 +22,7 @@ class SketchObject extends Component {
         this.state = {
             isSelected: false
         }
-        this.initShape(false)
+        this.initShape(false, props)
     }
     componentDidMount() {
         //console.log("this.isEdit:" + this.isEdit)
@@ -30,20 +30,20 @@ class SketchObject extends Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.selectedId === this.props.data.id) {
             console.log("found and selected")
-            this.initShape(true)
+            this.initShape(true, nextProps)
 
             this.addDraggableResponder()
         } else {
-            this.initShape(false)
+            this.initShape(false, nextProps)
         }
     }
-    initShape(isSelected) {
-        let shape = Utils.getItemType(this.props.data);
+    initShape(isSelected, props = this.props) {
+        let shape = Utils.getItemType(props.data);
         switch (shape) {
             case "SketchpadPolygon":
             case "SketchpadStraightLine":
             case "SketchpadCurvedLine":
-                let { points } = this.props.data;
+                let { points } = props.data;
                 if (points.length >= 4) {
                     let pointsArray = [];
                     for (var i = 0; i < points.length - 1; i += 2) {
@@ -65,9 +65,9 @@ class SketchObject extends Component {
             case "SketchpadShape":
             case "SketchpadRectangle":
                 this.state = {
-                    x: this.props.data.x * this.scaleFactor,
-                    y: this.props.data.y * this.scaleFactor,
-                    rotation: this.props.data.rotation,
+                    x: props.data.x * this.scaleFactor,
+                    y: props.data.y * this.scaleFactor,
+                    rotation: props.data.rotation,
                     isSelected
                 };
                 break;

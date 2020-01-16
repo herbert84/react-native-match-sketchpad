@@ -60,22 +60,23 @@ class Sketchpad extends Component {
         //console.log(itemName)
         let item = null;
         switch (itemName) {
-            case "SketchpadNew": item = <DrawLayer data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} attachAddPathEvent={(object) => this.attachAddPathEvent(object)} />; break;
-            case "SketchpadShape": item = <Item data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadStraightLine": item = <StraightLine selectedId={this.props.selectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadCurvedLine": item = <CurvedLine selectedId={this.props.selectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadNew": item = <DrawLayer key={data.id} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} attachAddPathEvent={(object) => this.attachAddPathEvent(object)} />; break;
+            case "SketchpadShape": item = <Item key={data.id} data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadStraightLine": item = <StraightLine key={data.id} selectedId={this.props.selectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadCurvedLine": item = <CurvedLine key={data.id} selectedId={this.props.selectedId} data={data} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
             case "SketchpadText":
                 item = <SketchText
+                    key={data.id}
                     data={data}
                     selectedId={this.props.selectedId}
                     attachObjectEvent={(object) => this.attachObjectEvent(object)}
                     onTextLayout={(layout) => this.props.onTextItemLayout ? this.props.onTextItemLayout(data, layout) : null}
                 />;
                 break;
-            case "SketchpadPolygon": item = <Polygon data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadRectangle": item = <Rectangle data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            case "SketchpadEllipse": item = <Ellipse data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
-            default: item = <Item data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadPolygon": item = <Polygon key={data.id} data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadRectangle": item = <Rectangle key={data.id} data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            case "SketchpadEllipse": item = <Ellipse key={data.id} data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
+            default: item = <Item key={data.id} data={data} selectedId={this.props.selectedId} attachObjectEvent={(object) => this.attachObjectEvent(object)} />; break;
         }
         return item;
     }
