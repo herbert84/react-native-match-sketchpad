@@ -47,7 +47,7 @@ class ToolBar extends Component {
             itemSelectedId: null,
             itemSelected: false,
             elementToolBarX: new Animated.Value(94),// 点击元素按钮后展开及收拢的长度/宽度变化值
-            shapeToolBarX: new Animated.Value(ScreenHeight), // 点击图形后向上/向左展开及收拢的高度/宽度变化值
+            shapeToolBarX: new Animated.Value(0), // 点击图形后向上/向左展开及收拢的高度/宽度变化值
             selectedElementImage: ""  // 记录在工具条中选中的具体的物体(具体的线条，区域，球员或球场物体)，以便在继续绘制的时候高亮该物体
         }
     }
@@ -81,11 +81,14 @@ class ToolBar extends Component {
             }).start();
     }
     _showShapeTipView = () => {
-        let topMargin = ScreenWidth * 1960 / 1251;
+        //let topMargin = ScreenWidth * 1960 / 1251;
+        let contentHeight = this.state.showItemsModalShape === "LINE" ? 296 : 187;
+        let marginTop = (this.props.isPortrait) ? contentHeight + (Platform.OS === "android" ? 20 : 0) : 229;
         Animated.timing(
             this.state.shapeToolBarX,
             {
-                toValue: -topMargin - Utils.getPhoneTopDistance(),
+                //toValue: -topMargin - Utils.getPhoneTopDistance(),
+                toValue: marginTop,
                 duration: 200,   //动画时长300毫秒,
                 easing: Easing.linear
             }
@@ -97,7 +100,7 @@ class ToolBar extends Component {
         Animated.timing(
             this.state.shapeToolBarX,
             {
-                toValue: ScreenHeight,
+                toValue: 0,
                 duration: 200,   //动画时长300毫秒,
                 easing: Easing.linear
             }).start();
@@ -123,16 +126,14 @@ class ToolBar extends Component {
                     activeItem: item,
                     showShapeItems: item.nodes,
                     selectedColorIndex: this.defauleColorIndex[item.key]   // 设置选择颜色
-                });
-                //this._showShapeTipView();
+                }, () => this._showShapeTipView());
             } else {
                 let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image;
                 this.setState({
                     showItemsModal: false,
                     selectedElementImage: img,
                     drawingItem: item
-                });
-                this._hiddenTipView();
+                }, () => this._hiddenTipView());
                 //this._hiddenShapeTipView();
                 if (this.state.showItemsModalShape === "LINE" || this.state.showItemsModalShape === "AREAS") {
                     item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
@@ -146,14 +147,12 @@ class ToolBar extends Component {
                 this.setState({
                     expandElementItems: false,
                     showElementItems: this.props.isPortrait ? ToolElementItemsPortrait : ToolElementItemsLandscape
-                })
-                this._hiddenTipView()
+                }, () => this._hiddenTipView());
             } else {
                 this.setState({
                     expandElementItems: true,
                     showElementItems: this.props.isPortrait ? ToolElementItemsPortrait[0].nodes : ToolElementItemsLandscape[0].nodes
-                });
-                this._showTipView()
+                }, () => this._showTipView());
             }
         }
     }
@@ -210,10 +209,13 @@ class ToolBar extends Component {
      * @memberof ToolBar
      */
     onPressCancel() {
-        this.setState({
-            showItemsModal: false,
-            selectedColorIndex: this.defauleColorIndex[this.state.showItemsModalShape]  // 点击返回时，重置颜色选择为上一次成功绘制的颜色
-        });
+        this._hiddenShapeTipView();
+        setTimeout(() => {
+            this.setState({
+                showItemsModal: false,
+                selectedColorIndex: this.defauleColorIndex[this.state.showItemsModalShape]  // 点击返回时，重置颜色选择为上一次成功绘制的颜色
+            });
+        }, 300)
     }
     renderToolItem(item) {
         let itemStyle = this.props.isPortrait ? { marginRight: 22 } : { marginBottom: 22 };
@@ -293,9 +295,8 @@ class ToolBar extends Component {
             //竖屏模式下，如果是线条，则显示四行，如果是区域则显示一行，否则显示两行
             let contentHeight = this.state.showItemsModalShape === "LINE" ? 296 : 187;
             let numColumns = (this.state.showItemsModalShape === "LINE") ? Math.ceil(this.state.showShapeItems.length / 4) : this.state.showItemsModalShape === "AREAS" ? 3 : Math.ceil(this.state.showShapeItems.length / 2);
-            return (<View style={{ position: "absolute", bottom: 0, height: contentHeight + (Platform.OS === "android" ? 20 : 0), width: "100%", backgroundColor: "rgba(0,0,0,0.9)" }}>
+            return (<Animated.View style={{ position: "absolute", bottom: 0, height: this.state.shapeToolBarX, width: "100%", backgroundColor: "rgba(0,0,0,0.9)" }}>
                 {this.renderShapeSelectModalToolBar()}
-                {this.renderColorSelectionList()}
                 <ScrollView style={{ flexDirection: "row", paddingLeft: 16, paddingRight: 8 }} horizontal={true}>
                     <FlatList
                         data={this.state.showShapeItems}
@@ -305,13 +306,13 @@ class ToolBar extends Component {
                         renderItem={({ item }) => this.renderShapeItem(item)}
                     />
                 </ScrollView>
-            </View >)
+            </Animated.View>)
         } else {
-            return (<View style={{ position: "absolute", right: 0, width: 229, height: ScreenWidth, backgroundColor: "rgba(0,0,0,0.9)" }}>
+            return (<Animated.View style={{ position: "absolute", right: 0, width: this.state.shapeToolBarX, height: ScreenWidth, backgroundColor: "rgba(0,0,0,0.9)" }}>
                 {this.renderShapeSelectModalToolBar()}
                 {this.renderColorSelectionList()}
                 {this.renderListContainer()}
-            </View >)
+            </Animated.View>)
         }
     }
     /**
