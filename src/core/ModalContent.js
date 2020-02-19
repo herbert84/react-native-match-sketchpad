@@ -47,9 +47,14 @@ export default class ModalContent extends Component {
         //console.log(objectSelected);
         if (object.shape === "SketchpadText" && object.eventType === "DOUBLE_CLICK" && object.selectedId) {
             this.currentSketchpadTextItem = this._getItemById(object.selectedId);
-            //this.setState({
-            //    isEditingText: true
-            //});
+            this.textLayerKey = RNMatchSketchpadTopView.addContent(
+                <View
+                    style={{ width: this.props.needRotate ? ScreenHeight : ScreenWidth, height: this.props.needRotate ? ScreenWidth : ScreenHeight, left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center' }}>
+                    {this.renderTextEditView()}
+                </View>);
+            // this.setState({
+            //     isEditingText: true
+            // });
         } else {
             this.setState({
                 itemSelectedId: object.selectedId,
@@ -157,8 +162,11 @@ export default class ModalContent extends Component {
             // 设置文本位置,新建的文本应位于画布中央
             newItem.y = 1251 / 2;
             this.currentSketchpadTextItem = newItem;
-            this.textLayerKey = RNMatchSketchpadTopView.addContent(<View style={{ width: this.props.needRotate ? ScreenHeight : ScreenWidth, height: this.props.needRotate ? ScreenWidth : ScreenHeight, left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center' }}>
-                {this.renderTextEditView()}</View>);
+            this.textLayerKey = RNMatchSketchpadTopView.addContent(
+                <View
+                    style={{ width: this.props.needRotate ? ScreenHeight : ScreenWidth, height: this.props.needRotate ? ScreenWidth : ScreenHeight, left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center' }}>
+                    {this.renderTextEditView()}
+                </View>);
         } else {
             let drawLayerItem = DataModal.addDrawLayerData(newItem, width, height);
             this.drawLayerItem = drawLayerItem;

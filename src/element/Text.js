@@ -64,22 +64,21 @@ class SketchText extends SketchObject {
      * @memberof SketchText
      */
     onPressText() {
-        // let currentPressCount = this.state.pressTextCount ? this.state.pressTextCount : 0;
-        // this.setState({
-        //     pressTextCount: currentPressCount + 1
-        // });
-        //this.firePressEvent();
-        //this.objectOnPress();
-        /*let currentClickTime = new Date().getTime();
-        if (currentClickTime - this.state.lastClickTime < 200) {
-            this.objectOnDoublePress()
+        let currentPressCount = this.state.pressTextCount ? this.state.pressTextCount : 0;
+        this.setState({
+            pressTextCount: currentPressCount + 1
+        });
+        // this.objectOnPress();
+        let currentClickTime = new Date().getTime();
+        if (currentClickTime - this.state.lastClickTime < 1000) {
+            this.objectOnDoublePress();
         } else {
             this.objectOnPress();
         }
         this.setState({
             lastClickTime: currentClickTime
-        });*/
-        this.objectOnPress();
+        });
+        // this.objectOnPress();
     }
     measureTextSize(data) {
         let that = this;

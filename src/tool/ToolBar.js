@@ -297,6 +297,7 @@ class ToolBar extends Component {
             let numColumns = (this.state.showItemsModalShape === "LINE") ? Math.ceil(this.state.showShapeItems.length / 4) : this.state.showItemsModalShape === "AREAS" ? 3 : Math.ceil(this.state.showShapeItems.length / 2);
             return (<Animated.View style={{ position: "absolute", bottom: 0, height: this.state.shapeToolBarX, width: "100%", backgroundColor: "rgba(0,0,0,0.9)" }}>
                 {this.renderShapeSelectModalToolBar()}
+                {this.renderColorSelectionList()}
                 <ScrollView style={{ flexDirection: "row", paddingLeft: 16, paddingRight: 8 }} horizontal={true}>
                     <FlatList
                         data={this.state.showShapeItems}
