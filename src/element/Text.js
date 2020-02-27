@@ -28,7 +28,6 @@ class SketchText extends SketchObject {
         this.state = {
             x: props.data.x * this.scaleFactor,
             y: props.data.y * this.scaleFactor,
-            pressTextCount: 0,
             isTextMeasured: false,
             touchAreaX: 0,
             touchAreaY: 0,
@@ -64,13 +63,9 @@ class SketchText extends SketchObject {
      * @memberof SketchText
      */
     onPressText() {
-        let currentPressCount = this.state.pressTextCount ? this.state.pressTextCount : 0;
-        this.setState({
-            pressTextCount: currentPressCount + 1
-        });
         // this.objectOnPress();
         let currentClickTime = new Date().getTime();
-        if (currentClickTime - this.state.lastClickTime < 1000) {
+        if (currentClickTime - this.state.lastClickTime < 2000) {
             this.objectOnDoublePress();
         } else {
             this.objectOnPress();
