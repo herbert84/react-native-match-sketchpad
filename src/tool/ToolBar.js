@@ -128,19 +128,23 @@ class ToolBar extends Component {
                     selectedColorIndex: this.defauleColorIndex[item.key]   // 设置选择颜色
                 }, () => this._showShapeTipView());
             } else {
-                let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image;
-                this.setState({
-                    showItemsModal: false,
-                    selectedElementImage: img,
-                    drawingItem: item
-                }, () => this._hiddenTipView());
-                //this._hiddenShapeTipView();
-                if (this.state.showItemsModalShape === "LINE" || this.state.showItemsModalShape === "AREAS") {
-                    item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
-                    item.backgroundColor = ColorMappings[this.state.selectedColorIndex].backgroundColor;  //设置选中的颜色
-                }
-                this.defauleColorIndex[this.state.showItemsModalShape] = this.state.selectedColorIndex;  // 记住本次绘制所选择的颜色
-                this.props.startDrawMode(item)
+                this._hiddenShapeTipView();
+                this._hiddenTipView();
+                setTimeout(() => {
+                    let img = item.image.Vertical ? (this.props.isPortrait ? item.image.Vertical : item.image.Horizontal) : item.image;
+                    this.setState({
+                        showItemsModal: false,
+                        selectedElementImage: img,
+                        drawingItem: item
+                    });
+                    //this._hiddenShapeTipView();
+                    if (this.state.showItemsModalShape === "LINE" || this.state.showItemsModalShape === "AREAS") {
+                        item.color = ColorMappings[this.state.selectedColorIndex].color;  //设置选中的颜色
+                        item.backgroundColor = ColorMappings[this.state.selectedColorIndex].backgroundColor;  //设置选中的颜色
+                    }
+                    this.defauleColorIndex[this.state.showItemsModalShape] = this.state.selectedColorIndex;  // 记住本次绘制所选择的颜色
+                    this.props.startDrawMode(item)
+                }, 300);
             }
         } else {
             if (this.state.expandElementItems) {
