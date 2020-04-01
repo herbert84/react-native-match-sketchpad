@@ -31,6 +31,7 @@ class Sketchpad extends Component {
     renderTools() {
         return (this.props.renderTools && !this.props.fullMode) ? (<View><Text>Render Edit Tools</Text></View>) : null;
     }
+
     render() {
         return (<View>
             <Container
